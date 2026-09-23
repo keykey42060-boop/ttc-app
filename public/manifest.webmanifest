@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "ClearRide TTC Bus Tracker",
+  "short_name": "ClearRide",
+  "description": "An accessible TTC Route 121 bus tracker.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#020617",
+  "theme_color": "#991b1b",
+  "icons": [
+    {
+      "src": "/icons/clearride-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/clearride-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
