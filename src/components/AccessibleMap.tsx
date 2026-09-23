@@ -374,7 +374,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       <div style="position: relative; width: 104px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; cursor: pointer;">
         <!-- Realistic TTC Stop Sign Banner -->
         <div style="padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: linear-gradient(135deg, #047857 0%, #065F46 100%); color: #FFFFFF; border: 1.5px solid #FDE047; box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45); margin-bottom: 3px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-          <span style="color: #FDE047;">⭐</span> Mom's Stop #${stopCode}
+          <span style="color: #FDE047;">⭐</span> Your Stop #${stopCode}
         </div>
 
         <!-- 28px Realistic Transit Pole Puck -->
@@ -830,7 +830,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           className="px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5 shrink-0 border border-emerald-500/30 transition-all shadow-2xs"
         >
           <span>⭐</span>
-          <span>Mom's Stop (#{activeMomStop.code})</span>
+          <span>Your Stop (#{activeMomStop.code})</span>
         </button>
 
         {/* Full Route Chip */}
@@ -968,7 +968,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 onClick={focusMomStop}
                 className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1 transition-all border border-black/5 dark:border-white/10 active:scale-98"
               >
-                <span>⭐ Mom's Stop</span>
+                <span>⭐ Your Stop</span>
               </button>
             </div>
           </div>
@@ -992,7 +992,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                     </span>
                     {selectedStop.code === activeMomStop.code && (
                       <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-600 text-white uppercase">
-                        ⭐ MOM'S BOARDING STOP
+                        ⭐ YOUR BOARDING STOP
                       </span>
                     )}
                   </div>
@@ -1039,7 +1039,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                   className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-98"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-                  <span>Set as Mom's Stop</span>
+                  <span>Set as Your Stop</span>
                 </button>
               )}
             </div>
