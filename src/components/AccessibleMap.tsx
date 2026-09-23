@@ -325,7 +325,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       : 'box-shadow: 0 4px 12px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.25);';
 
     return `
-      <div style="position: relative; width: 46px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
+      <div style="position: relative; width: 46px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
         
         <!-- Floating Realistic ETA Badge -->
         <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
@@ -601,8 +601,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           icon: L.divIcon({
             html,
             className: 'realistic-bus-puck-marker',
-            iconSize: [46, 52],
-            iconAnchor: [23, 36],
+            iconSize: [46, 64],
+            iconAnchor: [23, 33],
           }),
           zIndexOffset: isPrimary ? 1200 : 1000 - index,
         }).addTo(map);
