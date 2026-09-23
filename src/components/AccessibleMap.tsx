@@ -320,6 +320,11 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           <!-- Front windshield and roof windows -->
           <div style="position: absolute; top: 4px; left: 3px; right: 3px; height: 9px; border-radius: 3px 3px 2px 2px; background: #17324D; border: 1px solid rgba(255,255,255,0.65);"></div>
           <div style="position: absolute; top: 16px; left: 3px; right: 3px; height: 11px; border-radius: 2px; background: #2B5878; border: 1px solid rgba(255,255,255,0.45);"></div>
+          <div style="position: absolute; top: 29px; left: 3px; right: 3px; height: 7px; border-radius: 2px; background: #2B5878; border: 1px solid rgba(255,255,255,0.45);"></div>
+          <!-- TTC-style livery stripe, rear door, and lights -->
+          <div style="position: absolute; top: 28px; left: -1px; right: -1px; height: 3px; background: #FFFFFF; opacity: 0.95;"></div>
+          <div style="position: absolute; bottom: 3px; left: 5px; width: 5px; height: 5px; border-radius: 1px; background: #C9E6F5; border: 1px solid rgba(255,255,255,0.8);"></div>
+          <div style="position: absolute; bottom: 3px; right: 5px; width: 5px; height: 5px; border-radius: 1px; background: #FDE047; border: 1px solid rgba(255,255,255,0.8);"></div>
           <!-- Wheels -->
           <div style="position: absolute; left: -4px; top: 9px; width: 5px; height: 10px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
           <div style="position: absolute; right: -4px; top: 9px; width: 5px; height: 10px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
