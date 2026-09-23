@@ -308,7 +308,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       : 'box-shadow: 0 4px 12px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.25);';
 
     return `
-      <div style="position: relative; width: 46px; height: 59px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
+      <div style="position: relative; width: 46px; height: 71px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
         
         <!-- Floating Realistic ETA Badge -->
         <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
@@ -316,9 +316,9 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         </div>
 
         <!-- Rotating vehicle orientation keeps the front arrow attached to the bus nose -->
-        <div class="realistic-bus-orientation" style="position: relative; width: 22px; height: 44px; transform: rotate(${Math.round(heading)}deg); transform-origin: center center;">
+        <div class="realistic-bus-orientation" style="position: relative; width: 22px; height: 56px; transform: rotate(${Math.round(heading)}deg); transform-origin: center center;">
           <!-- Realistic red bus body -->
-          <div class="realistic-bus-body" style="position: relative; width: 22px; height: 44px; border-radius: 6px 6px 4px 4px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
+          <div class="realistic-bus-body" style="position: absolute; top: 12px; left: 0; width: 22px; height: 44px; border-radius: 6px 6px 4px 4px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
           <!-- Front windshield and roof windows -->
           <div style="position: absolute; top: 5px; left: 3px; right: 3px; height: 10px; border-radius: 3px 3px 2px 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
           <div style="position: absolute; top: 18px; left: 3px; right: 3px; height: 10px; border-radius: 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
@@ -336,7 +336,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
           <!-- Directional arrow fixed to the front/nose of the bus -->
           <div class="realistic-bus-heading-needle" style="position: absolute; left: 0; right: 0; top: 0; height: 12px; display: flex; justify-content: center; pointer-events: none; z-index: 3;">
-            <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -4px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
+            <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: 4px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
           </div>
         </div>
       </div>
