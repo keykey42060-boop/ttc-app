@@ -90,6 +90,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   // State: Default to 'detailed' (Detailed Google Maps street view)
   const [mapTheme, setMapTheme] = useState<MapLayerType>('detailed');
   const [liveVehicles, setLiveVehicles] = useState<RealTTCVehicle[]>([]);
+  const feedRequestInFlightRef = useRef(false);
   const [isLoadingLive, setIsLoadingLive] = useState<boolean>(false);
   const [lastFeedSync, setLastFeedSync] = useState<string>('Syncing live...');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
@@ -161,8 +162,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     }
   }, []);
 
-  // Ultra-fast network fetch (every 1.5 seconds)
+  // Poll TTC promptly without allowing slow requests to overlap.
   const refreshTTCFeed = useCallback(async () => {
+    if (feedRequestInFlightRef.current) return;
+    feedRequestInFlightRef.current = true;
     try {
       const vehicles = await fetchLiveTTCVehicles(
         '121',
@@ -210,14 +213,19 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];
       setLastFeedSync(newestUpdate ? `TTC updated ${Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000))}s ago` : 'Waiting for TTC vehicles');
     } catch (err) {
-      console.error('Fast feed refresh error:', err);
+      console.error('TTC feed refresh error:', err);
+      setLiveVehicles([]);
+      animStatesRef.current.clear();
+      setLastFeedSync('TTC feed unavailable');
+    } finally {
+      feedRequestInFlightRef.current = false;
     }
   }, [activeMomStop.lat, activeMomStop.lng, route.direction]);
 
-  // Ultra-fast polling interval: 1.5 seconds (1500ms) for true real-time responsiveness
+  // Poll every second; the TTC position timestamp shown in the UI reflects source freshness.
   useEffect(() => {
     refreshTTCFeed();
-    const interval = setInterval(refreshTTCFeed, 1500);
+    const interval = setInterval(refreshTTCFeed, 1000);
     return () => clearInterval(interval);
   }, [refreshTTCFeed]);
 
@@ -324,19 +332,22 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           ${minutes}m
         </div>
 
-        <!-- 32px Circular Realistic Bus Puck -->
-        <div style="position: relative; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
-          
-          <!-- Directional Heading Pointer (Street-Aligned) -->
-          <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transform: rotate(${Math.round(heading)}deg);">
-            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -7px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
-          </div>
-
-          <!-- Bus Number inside puck -->
-          <span style="font-size: 10.5px; font-weight: 900; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: white; line-height: 1; letter-spacing: -0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
-            ${cleanVid.length > 4 ? cleanVid.slice(-3) : cleanVid}
-          </span>
+        <!-- Top-down bus body, aligned to the vehicle's reported heading -->
+        <div class="realistic-bus-heading-needle" style="position: relative; width: 25px; height: 38px; border-radius: 7px 7px 5px 5px; ${bgGradient} border: 2px solid #FFFFFF; ${glowShadow} transform: rotate(${Math.round(heading)}deg); display: flex; flex-direction: column; align-items: center; padding-top: 3px; box-sizing: border-box;">
+          <!-- Front windshield and destination panel -->
+          <div style="width: 13px; height: 6px; border-radius: 3px 3px 1px 1px; background: #CFFAFE; border: 1px solid rgba(255,255,255,.85);"></div>
+          <div style="width: 15px; height: 2px; background: #FACC15; margin-top: 2px; border-radius: 2px;"></div>
+          <!-- Side windows -->
+          <div style="width: 15px; height: 8px; margin-top: 3px; border-radius: 2px; background: #DBEAFE; border: 1px solid rgba(255,255,255,.8);"></div>
+          <!-- Rear window -->
+          <div style="width: 11px; height: 4px; margin-top: 2px; border-radius: 1px 1px 3px 3px; background: #BFDBFE;"></div>
+          <!-- Wheels -->
+          <span style="position:absolute; left:-3px; top:9px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 12px 0 #111827;"></span>
+          <span style="position:absolute; right:-3px; top:9px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 12px 0 #111827;"></span>
         </div>
+        <span style="margin-top:1px; font-size:8px; line-height:9px; font-weight:900; font-family:system-ui,sans-serif; color:#FFFFFF; text-shadow:0 1px 3px #111827; white-space:nowrap;">
+          ${cleanVid}
+        </span>
       </div>
     `;
   };
