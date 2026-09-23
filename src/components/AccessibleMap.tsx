@@ -308,7 +308,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       : 'box-shadow: 0 4px 12px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.25);';
 
     return `
-      <div style="position: relative; width: 46px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
+      <div style="position: relative; width: 46px; height: 59px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
         
         <!-- Floating Realistic ETA Badge -->
         <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
@@ -316,15 +316,15 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         </div>
 
         <!-- Realistic red bus body -->
-        <div style="position: relative; width: 27px; height: 37px; border-radius: 7px 7px 5px 5px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
+        <div style="position: relative; width: 22px; height: 44px; border-radius: 6px 6px 4px 4px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
           <!-- Front windshield and roof windows -->
-          <div style="position: absolute; top: 4px; left: 4px; right: 4px; height: 7px; border-radius: 3px 3px 2px 2px; background: #17324D; border: 1px solid rgba(255,255,255,0.65);"></div>
-          <div style="position: absolute; top: 14px; left: 4px; right: 4px; height: 7px; border-radius: 2px; background: #2B5878; border: 1px solid rgba(255,255,255,0.45);"></div>
+          <div style="position: absolute; top: 4px; left: 3px; right: 3px; height: 9px; border-radius: 3px 3px 2px 2px; background: #17324D; border: 1px solid rgba(255,255,255,0.65);"></div>
+          <div style="position: absolute; top: 16px; left: 3px; right: 3px; height: 11px; border-radius: 2px; background: #2B5878; border: 1px solid rgba(255,255,255,0.45);"></div>
           <!-- Wheels -->
-          <div style="position: absolute; left: -4px; top: 8px; width: 5px; height: 9px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; right: -4px; top: 8px; width: 5px; height: 9px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; left: -4px; bottom: 7px; width: 5px; height: 9px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; right: -4px; bottom: 7px; width: 5px; height: 9px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; left: -4px; top: 9px; width: 5px; height: 10px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; right: -4px; top: 9px; width: 5px; height: 10px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; left: -4px; bottom: 9px; width: 5px; height: 10px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; right: -4px; bottom: 9px; width: 5px; height: 10px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
           
           <!-- Directional Heading Pointer (Street-Aligned) -->
           <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transform: rotate(${Math.round(heading)}deg);">
@@ -332,7 +332,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           </div>
 
           <!-- Bus Number on the side panel -->
-          <span style="font-size: 7px; font-weight: 900; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: white; line-height: 1; letter-spacing: -0.2px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
+          <span style="font-size: 6px; font-weight: 900; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: white; line-height: 1; letter-spacing: -0.2px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
             ${cleanVid.length > 4 ? cleanVid.slice(-3) : cleanVid}
           </span>
         </div>
