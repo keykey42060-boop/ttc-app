@@ -28,7 +28,8 @@ import {
   Sparkles,
   Zap,
   Layers,
-  Map as MapIcon
+  Map as MapIcon,
+  MessageSquare
 } from 'lucide-react';
 
 interface AccessibleMapProps {
@@ -834,6 +835,15 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           <span>⭐</span>
           <span>Mom's Stop (#{activeMomStop.code})</span>
         </button>
+
+        <a
+          href={`sms:898882?body=${encodeURIComponent(activeMomStop.code)}`}
+          aria-label={`Text TTC for arrivals at stop ${activeMomStop.code}`}
+          className="px-3 py-1 rounded-full bg-sky-500/10 hover:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-bold flex items-center gap-1.5 shrink-0 border border-sky-500/30 transition-all shadow-2xs"
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>Text Arrivals</span>
+        </a>
 
         {/* Full Route Chip */}
         <button
