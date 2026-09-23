@@ -98,7 +98,7 @@ function getRouteDistanceToStop(
   stopLat: number,
   stopLng: number,
   direction: 'East' | 'West'
-): number {
+): { distanceMeters: number; isApproaching: boolean } {
   const points = direction === 'West' ? ROUTE_121_WESTBOUND_POLYLINE : ROUTE_121_EASTBOUND_POLYLINE;
   const vehicleIndex = nearestPolylineIndex(points, lat, lng);
   const stopIndex = nearestPolylineIndex(points, stopLat, stopLng);
@@ -110,7 +110,7 @@ function getRouteDistanceToStop(
     distance += getDistanceMeters(points[index][0], points[index][1], points[index + 1][0], points[index + 1][1]);
   }
 
-  return distance;
+  return { distanceMeters: distance, isApproaching: vehicleIndex <= stopIndex };
 }
 
 /**
@@ -123,7 +123,7 @@ export async function fetchLiveTTCVehicles(
   travelDirection: 'to_work' | 'to_home' = 'to_work'
 ): Promise<RealTTCVehicle[]> {
   const isGoingHome = travelDirection === 'to_home' || getDistanceMeters(momStopLat, momStopLng, MOM_HOME_STOP.lat, MOM_HOME_STOP.lng) < 100;
-  const expectedBusDir: 'West' | 'East' = isGoingHome ? 'West' : 'East';
+  const expectedBusDir: 'West' | 'East' = getDistanceMeters(momStopLat, momStopLng, MOM_WORK_STOP.lat, MOM_WORK_STOP.lng) < 100 ? 'West' : 'East';
 
   // 1. Primary: Current TTC Live Map vehicle feed
   try {
@@ -150,10 +150,12 @@ export async function fetchLiveTTCVehicles(
           const heading = parseInt(v.hdg, 10) || 0;
           const rawDir = (v.rtdir || '').toLowerCase();
           const direction: 'East' | 'West' = rawDir.includes('west') ? 'West' : rawDir.includes('east') ? 'East' : (heading > 150 && heading < 330) ? 'West' : 'East';
-          const routeDistanceM = getRouteDistanceToStop(lat, lng, momStopLat, momStopLng, direction);
+          const routeEstimate = getRouteDistanceToStop(lat, lng, momStopLat, momStopLng, direction);
+          const routeDistanceM = routeEstimate.distanceMeters;
           const speedKmH = Math.round(parseFloat(v.spd) * 1.60934) || 0;
           const effectiveSpeedKmH = Math.max(speedKmH, 18);
-          const estimatedMinutes = Math.max(1, Math.ceil(routeDistanceM / (effectiveSpeedKmH * 1000 / 60)));
+          const travelMinutes = Math.max(1, Math.ceil(routeDistanceM / (effectiveSpeedKmH * 1000 / 60)));
+          const estimatedMinutes = routeEstimate.isApproaching ? travelMinutes : Math.max(30, travelMinutes + 30);
           const distM = routeDistanceM;
           const arrivalDate = new Date(now.getTime() + estimatedMinutes * 60000);
           const arrivalClock = arrivalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
