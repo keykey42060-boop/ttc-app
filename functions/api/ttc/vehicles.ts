@@ -121,7 +121,8 @@ export async function onRequestGet({ request }: { request: Request }): Promise<R
 
   try {
     const upstream = await fetch('https://bustime.ttc.ca/gtfsrt/vehicles', {
-      headers: { Accept: 'application/x-protobuf, application/octet-stream' },
+      headers: { Accept: 'application/x-protobuf, application/octet-stream', 'Cache-Control': 'no-cache' },
+      cache: 'no-store',
       signal: AbortSignal.timeout(7000),
     });
     if (!upstream.ok) {
