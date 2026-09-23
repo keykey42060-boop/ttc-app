@@ -51,7 +51,7 @@ interface VehicleAnimState {
   targetLng: number;
   currentHeading: number;
   targetHeading: number;
-  speedKmH: number;
+  speedKmH: number | null;
   lastUpdate: number;
 }
 
@@ -739,8 +739,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {/* 60 FPS Real-time Glide Indicator */}
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>60 FPS GLIDE</span>
-            <span className="opacity-70">• 1.5s SYNC</span>
+            <span>TTC GTFS-RT</span>
+            <span className="opacity-70">• {lastFeedSync}</span>
           </div>
         </div>
 
@@ -942,7 +942,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
                   <Gauge className="w-3 h-3 text-blue-500" /> Speed
                 </div>
-                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{selectedVehicle.speedKmH} km/h</div>
+                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{selectedVehicle.speedKmH === null ? 'Not reported' : `${selectedVehicle.speedKmH} km/h`}</div>
               </div>
               <div className="bg-slate-100/70 dark:bg-slate-800/60 p-2 rounded-xl">
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
