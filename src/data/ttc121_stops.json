@@ -1,0 +1,339 @@
+{
+  "routeNum": "121",
+  "routeName": "Esplanade-River",
+  "stops": [
+    {
+      "headsign": "East - 121 Esplanade-River Towards Hennick Bridgepoint Hospital",
+      "compassDirection": "East",
+      "stopList": [
+        {
+          "stopCode": "16754",
+          "stopName": "1 Front St West - Union Station",
+          "parentStopCode": "",
+          "routes": [
+            "114",
+            "121",
+            "202"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "15509",
+          "stopName": "Church St at The Esplanade",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "6375",
+          "stopName": "The Esplanade at Lower Jarvis St East Side",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "6376",
+          "stopName": "The Esplanade at Lower Sherbourne St",
+          "parentStopCode": "",
+          "routes": [
+            "75",
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16038",
+          "stopName": "Princess St at The Esplanade North Side",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16039",
+          "stopName": "Front St East at Berkeley St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "11914",
+          "stopName": "Front St East at Parliament St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "15510",
+          "stopName": "Front St East at Cherry St",
+          "parentStopCode": "",
+          "routes": [
+            "121",
+            "202"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16024",
+          "stopName": "Front St East at Bayview Ave",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16026",
+          "stopName": "River St at Queen St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16028",
+          "stopName": "River St at Dundas St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16030",
+          "stopName": "River St at Gerrard St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "1080",
+          "stopName": "Gerrard St East at Blackburn St",
+          "parentStopCode": "",
+          "routes": [
+            "121",
+            "306",
+            "506"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16263",
+          "stopName": "Jack Layton Way at Blue Rodeo Dr",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16033",
+          "stopName": "Jack Layton Way at St Matthews Rd",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        }
+      ]
+    },
+    {
+      "headsign": "West - 121 Esplanade-River Towards Union Station",
+      "compassDirection": "West",
+      "stopList": [
+        {
+          "stopCode": "16033",
+          "stopName": "Jack Layton Way at St Matthews Rd",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16034",
+          "stopName": "St Matthews Rd at Gerrard St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16031",
+          "stopName": "Gerrard St East at River St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16029",
+          "stopName": "River St at Dundas St East South Side",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16027",
+          "stopName": "River St at King St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16025",
+          "stopName": "Bayview Ave at Front St East",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "15246",
+          "stopName": "Mill St at Cherry St West Side",
+          "parentStopCode": "",
+          "routes": [
+            "121",
+            "202"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "6604",
+          "stopName": "Mill St at Trinity St",
+          "parentStopCode": "",
+          "routes": [
+            "121",
+            "202"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "6603",
+          "stopName": "Mill St at Parliament St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "11164",
+          "stopName": "Berkeley St at Front St East South Side",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "11166",
+          "stopName": "The Esplanade at Princess St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "11167",
+          "stopName": "The Esplanade at Lower Sherbourne St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "11169",
+          "stopName": "The Esplanade at Lower Jarvis St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "15583",
+          "stopName": "The Esplanade at Church St West Side",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "12425",
+          "stopName": "The Esplanade at Yonge St",
+          "parentStopCode": "",
+          "routes": [
+            "121"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "13455",
+          "stopName": "Yonge St at Front St East",
+          "parentStopCode": "",
+          "routes": [
+            "121",
+            "320"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "246",
+          "stopName": "Bay St at Front St West South Side - Union Station",
+          "parentStopCode": "",
+          "routes": [
+            "114",
+            "121",
+            "202",
+            "320"
+          ],
+          "stationFeatures": []
+        },
+        {
+          "stopCode": "16754",
+          "stopName": "1 Front St West - Union Station",
+          "parentStopCode": "",
+          "routes": [
+            "114",
+            "121",
+            "202"
+          ],
+          "stationFeatures": []
+        }
+      ]
+    }
+  ],
+  "routeDesc": "Westbound 121: from Bridgepoint Hospital via west on Jack Layton Way, south on St Matthews Road, west on Gerrard Street East, south on River Street, south on Lower River Street, east on Lawren Harris Square, south on Bayview Avenue, west on Mill Street, north on Parliament Street, west on Front Street East, south on Berkeley Street, west on The Esplanade, north on Yonge Street, west on Wellington Street West, south on Bay Street to east on Front Street West.\nEastbound 121: from Union Station via east on Front Street West, east on Front Street East, south on Church Street, east on The Esplanade, north on Princess Street, east on Front Street East, north on Bayview Avenue, west and north on Lawren Harris Square, north on Lower River Street, north on River Street, east on Gerrard Street East, north on Broadview Avenue, to east on Jack Layton Way.",
+  "routeType": 700,
+  "serviceLevel": {
+    "name": "Regular service",
+    "description": "Operates all day, every day, until 1 a.m.",
+    "color": "Red",
+    "cssClassDashboard": "RouteNameIcon RouteNameIconLarge RouteNameIconBus RouteNameIconRed",
+    "cssClassConnectingBus": ""
+  },
+  "is10MinutesNetwork": false
+}

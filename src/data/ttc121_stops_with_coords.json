@@ -1,0 +1,188 @@
+{
+  "1080": {
+    "code": "1080",
+    "name": "Gerrard St East at Blackburn St",
+    "lng": -79.355383,
+    "lat": 43.664667
+  },
+  "246": {
+    "code": "246",
+    "name": "Bay St at Front St West South Side - Union Station",
+    "lng": -79.378997,
+    "lat": 43.645484
+  },
+  "6603": {
+    "code": "6603",
+    "name": "Mill St at Parliament St",
+    "lng": -79.36191,
+    "lat": 43.650318
+  },
+  "6604": {
+    "code": "6604",
+    "name": "Mill St at Trinity St",
+    "lng": -79.359623,
+    "lat": 43.650855
+  },
+  "6375": {
+    "code": "6375",
+    "name": "The Esplanade at Lower Jarvis St East Side",
+    "lng": -79.370453,
+    "lat": 43.648249
+  },
+  "6376": {
+    "code": "6376",
+    "name": "The Esplanade at Lower Sherbourne St",
+    "lng": -79.367679,
+    "lat": 43.648898
+  },
+  "11164": {
+    "code": "11164",
+    "name": "Berkeley St at Front St East South Side",
+    "lng": -79.36392,
+    "lat": 43.650874
+  },
+  "11166": {
+    "code": "11166",
+    "name": "The Esplanade at Princess St",
+    "lng": -79.36594,
+    "lat": 43.649391
+  },
+  "11167": {
+    "code": "11167",
+    "name": "The Esplanade at Lower Sherbourne St",
+    "lng": -79.367145,
+    "lat": 43.649115
+  },
+  "11169": {
+    "code": "11169",
+    "name": "The Esplanade at Lower Jarvis St",
+    "lng": -79.370746,
+    "lat": 43.648293
+  },
+  "11914": {
+    "code": "11914",
+    "name": "Front St East at Parliament St",
+    "lng": -79.362968,
+    "lat": 43.651418
+  },
+  "12425": {
+    "code": "12425",
+    "name": "The Esplanade at Yonge St",
+    "lng": -79.37637,
+    "lat": 43.645867
+  },
+  "16024": {
+    "code": "16024",
+    "name": "Front St East at Bayview Ave",
+    "lng": -79.353876,
+    "lat": 43.653507
+  },
+  "16025": {
+    "code": "16025",
+    "name": "Bayview Ave at Front St East",
+    "lng": -79.353851,
+    "lat": 43.653731
+  },
+  "16026": {
+    "code": "16026",
+    "name": "River St at Queen St East",
+    "lng": -79.356389,
+    "lat": 43.657289
+  },
+  "16027": {
+    "code": "16027",
+    "name": "River St at King St East",
+    "lng": -79.356315,
+    "lat": 43.656931
+  },
+  "16028": {
+    "code": "16028",
+    "name": "River St at Dundas St East",
+    "lng": -79.358032,
+    "lat": 43.661107
+  },
+  "16029": {
+    "code": "16029",
+    "name": "River St at Dundas St East South Side",
+    "lng": -79.358107,
+    "lat": 43.660838
+  },
+  "16030": {
+    "code": "16030",
+    "name": "River St at Gerrard St East",
+    "lng": -79.359065,
+    "lat": 43.663491
+  },
+  "16031": {
+    "code": "16031",
+    "name": "Gerrard St East at River St",
+    "lng": -79.358666,
+    "lat": 43.663948
+  },
+  "16033": {
+    "code": "16033",
+    "name": "Jack Layton Way at St Matthews Rd",
+    "lng": -79.354843,
+    "lat": 43.665695
+  },
+  "16034": {
+    "code": "16034",
+    "name": "St Matthews Rd at Gerrard St East",
+    "lng": -79.355329,
+    "lat": 43.66496
+  },
+  "16038": {
+    "code": "16038",
+    "name": "Princess St at The Esplanade North Side",
+    "lng": -79.366189,
+    "lat": 43.649789
+  },
+  "16039": {
+    "code": "16039",
+    "name": "Front St East at Berkeley St",
+    "lng": -79.364259,
+    "lat": 43.651134
+  },
+  "16263": {
+    "code": "16263",
+    "name": "Jack Layton Way at Blue Rodeo Dr",
+    "lng": -79.353523,
+    "lat": 43.666089
+  },
+  "16754": {
+    "code": "16754",
+    "name": "1 Front St West - Union Station",
+    "lng": -79.377816,
+    "lat": 43.646205
+  },
+  "13455": {
+    "code": "13455",
+    "name": "Yonge St at Front St East",
+    "lng": -79.376766,
+    "lat": 43.646768
+  },
+  "15246": {
+    "code": "15246",
+    "name": "Mill St at Cherry St West Side",
+    "lng": -79.357883,
+    "lat": 43.65127
+  },
+  "15509": {
+    "code": "15509",
+    "name": "Church St at The Esplanade",
+    "lng": -79.37348,
+    "lat": 43.647498
+  },
+  "15510": {
+    "code": "15510",
+    "name": "Front St East at Cherry St",
+    "lng": -79.358636,
+    "lat": 43.652436
+  },
+  "15583": {
+    "code": "15583",
+    "name": "The Esplanade at Church St West Side",
+    "lng": -79.37365,
+    "lat": 43.647131
+  }
+}

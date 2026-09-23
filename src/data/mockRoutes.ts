@@ -1,0 +1,146 @@
+import { BusRouteConfig, Landmark, GeoRoutePoint } from '../types/bus';
+
+// Accurate real-world Downtown Toronto GPS coordinates (WGS84 Lat/Lng)
+export const TORONTO_TTC_LANDMARKS: Landmark[] = [
+  {
+    id: 'stop-front-west',
+    name: 'Front St West Stop (#16754)',
+    category: 'home',
+    iconEmoji: '🚏',
+    lat: 43.64570,
+    lng: -79.38540,
+    street: 'Front St West near Simcoe St',
+    color: '#EF4444',
+    description: 'TTC Stop #16754 (Front St West at Simcoe, eastbound shelter)',
+  },
+  {
+    id: 'union-station',
+    name: 'Union Station & TTC Subway',
+    category: 'townhall',
+    iconEmoji: '🏛️',
+    lat: 43.64600,
+    lng: -79.37980,
+    street: 'Front St & Bay St',
+    color: '#3B82F6',
+    description: 'Toronto Union Station grand historic terminal and subway hub',
+  },
+  {
+    id: 'meridian-hall',
+    name: 'Meridian Hall (Sony Centre)',
+    category: 'library',
+    iconEmoji: '🎭',
+    lat: 43.64660,
+    lng: -79.37580,
+    street: 'Front St East & Yonge / Scott',
+    color: '#A855F7',
+    description: 'Performing arts plaza on south side of Front Street',
+  },
+  {
+    id: 'berczy-park',
+    name: 'Berczy Park & Dog Fountain',
+    category: 'park',
+    iconEmoji: '🐕',
+    lat: 43.64840,
+    lng: -79.37460,
+    street: 'Wellington St & Church St',
+    color: '#10B981',
+    description: 'Iconic park with the famous cast-iron dog fountain & Flatiron building',
+  },
+  {
+    id: 'shoppers-pharmacy',
+    name: 'Shoppers Drug Mart',
+    category: 'pharmacy',
+    iconEmoji: '💊',
+    lat: 43.64800,
+    lng: -79.37280,
+    street: 'Front St & Church St',
+    color: '#14B8A6',
+    description: 'Pharmacy & convenience at northeast corner of Front & Church',
+  },
+  {
+    id: 'st-lawrence-market',
+    name: 'St. Lawrence Market',
+    category: 'market',
+    iconEmoji: '🛒',
+    lat: 43.64880,
+    lng: -79.37160,
+    street: 'Front St & Jarvis St',
+    color: '#F59E0B',
+    description: 'World-famous historic indoor food market at Front & Jarvis',
+  },
+  {
+    id: 'stop-church-esplanade',
+    name: 'The Esplanade at Church St West Side (#15583)',
+    category: 'work',
+    iconEmoji: '🏢',
+    lat: 43.647131,
+    lng: -79.373650,
+    street: 'The Esplanade at Church St West Side',
+    color: '#EF4444',
+    description: 'TTC Stop #15583 (The Esplanade at Church St West Side)',
+  },
+];
+
+// MORNING TO WORK (Eastbound along Front St -> South down Church St to The Esplanade)
+export const TO_WORK_POINTS: GeoRoutePoint[] = [
+  { lat: 43.64570, lng: -79.38540, streetName: 'Front Street West', landmarkNear: 'Front St West Stop (#16754)', stopName: 'Stop #16754 (Front St West)' },
+  { lat: 43.64560, lng: -79.38260, streetName: 'Front & York St' },
+  { lat: 43.64600, lng: -79.37980, streetName: 'Front & Bay St (Union Station)', landmarkNear: 'Union Station & TTC Subway' },
+  { lat: 43.64650, lng: -79.37760, streetName: 'Front & Bay / Yonge' },
+  { lat: 43.64690, lng: -79.37650, streetName: 'Front & Yonge St', landmarkNear: 'Meridian Hall' },
+  { lat: 43.64730, lng: -79.37480, streetName: 'Front & Scott St' },
+  { lat: 43.64790, lng: -79.37300, streetName: 'Front & Church St', landmarkNear: 'Shoppers Drug Mart' },
+  // Turn South on Church Street towards The Esplanade
+  { lat: 43.64760, lng: -79.37305, streetName: 'Church Street Southbound', landmarkNear: 'Berczy Park' },
+  { lat: 43.647131, lng: -79.373650, streetName: 'The Esplanade at Church St', landmarkNear: 'The Esplanade Stop (#15583)', stopName: 'Stop #15583 (The Esplanade at Church)' },
+];
+
+// EVENING TO HOME (North on Church St -> Westbound along Front St to Front St West)
+export const TO_HOME_POINTS: GeoRoutePoint[] = [
+  { lat: 43.647131, lng: -79.373650, streetName: 'The Esplanade at Church St', landmarkNear: 'The Esplanade Stop (#15583)', stopName: 'Stop #15583 (The Esplanade at Church)' },
+  { lat: 43.64760, lng: -79.37305, streetName: 'Church Street Northbound', landmarkNear: 'Berczy Park' },
+  { lat: 43.64790, lng: -79.37300, streetName: 'Front & Church St', landmarkNear: 'Shoppers Drug Mart' },
+  // Turn West on Front Street
+  { lat: 43.64730, lng: -79.37480, streetName: 'Front & Scott St' },
+  { lat: 43.64690, lng: -79.37650, streetName: 'Front & Yonge St', landmarkNear: 'Meridian Hall' },
+  { lat: 43.64650, lng: -79.37760, streetName: 'Front & Bay / Yonge' },
+  { lat: 43.64600, lng: -79.37980, streetName: 'Front & Bay St (Union Station)', landmarkNear: 'Union Station & TTC Subway' },
+  { lat: 43.64560, lng: -79.38260, streetName: 'Front & York St' },
+  { lat: 43.64570, lng: -79.38540, streetName: 'Front Street West', landmarkNear: 'Front St West Stop (#16754)', stopName: 'Stop #16754 (Front St West)' },
+];
+
+export const ROUTE_TO_WORK: BusRouteConfig = {
+  id: 'route-to-work',
+  routeNumber: '121',
+  routeName: '121 Esplanade - River Eastbound',
+  badgeColor: '#E11D48',
+  originName: 'Front St West - Union Station',
+  originStopId: '#16754',
+  destinationName: 'The Esplanade at Church St',
+  destinationStopId: '#15583',
+  direction: 'to_work',
+  myStopName: '1 Front St West - Union Station (TTC Stop #16754)',
+  myStopCoordinates: { lat: 43.646205, lng: -79.377816 },
+  destinationStopCoordinates: { lat: 43.647131, lng: -79.373650 },
+  points: TO_WORK_POINTS,
+  landmarks: TORONTO_TTC_LANDMARKS,
+  scheduledIntervalMinutes: 10,
+};
+
+export const ROUTE_TO_HOME: BusRouteConfig = {
+  id: 'route-to-home',
+  routeNumber: '121',
+  routeName: '121 Esplanade - Front Westbound',
+  badgeColor: '#E11D48',
+  originName: 'The Esplanade at Church St West Side',
+  originStopId: '#15583',
+  destinationName: 'Front St West - Union Station',
+  destinationStopId: '#16754',
+  direction: 'to_home',
+  myStopName: 'The Esplanade at Church St West Side (TTC Stop #15583)',
+  myStopCoordinates: { lat: 43.647131, lng: -79.373650 },
+  destinationStopCoordinates: { lat: 43.646205, lng: -79.377816 },
+  points: TO_HOME_POINTS,
+  landmarks: TORONTO_TTC_LANDMARKS,
+  scheduledIntervalMinutes: 11,
+};

@@ -1,0 +1,23 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Ensure Leaflet tiles and panes render crisply without white flash */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #121826 !important;
+  font-family: inherit;
+}
+
+.leaflet-tile {
+  filter: brightness(0.95) contrast(1.05);
+}
+
+/* Custom TTC Bus Marker Styles */
+.custom-bus-marker,
+.custom-stop-marker,
+.custom-landmark-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
