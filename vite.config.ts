@@ -13,6 +13,10 @@ export default defineConfig(() => {
     },
     server: {
       proxy: {
+        '/api/vehicle-positions': {
+          target: 'https://ttcmapsapi-ewacfyffhjffhces.canadacentral-01.azurewebsites.net',
+          changeOrigin: true,
+        },
         '/api': {
           target: 'https://bustime.ttc.ca',
           changeOrigin: true,

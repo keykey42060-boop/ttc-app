@@ -78,7 +78,7 @@ function interpolatePolyline(pts: [number, number][], progress: number): { lat: 
 }
 
 /**
- * Fetch real-time vehicles from TTC API with rapid 1.5s timeout for zero lag
+ * Fetch real-time vehicles from the same live feed used by TTC Live Map
  */
 export async function fetchLiveTTCVehicles(
   routeNum: string = '121',
@@ -89,14 +89,14 @@ export async function fetchLiveTTCVehicles(
   const isGoingHome = travelDirection === 'to_home' || getDistanceMeters(momStopLat, momStopLng, MOM_HOME_STOP.lat, MOM_HOME_STOP.lng) < 100;
   const expectedBusDir: 'West' | 'East' = isGoingHome ? 'West' : 'East';
 
-  // 1. Primary: Official TTC BusTime REST API with fast 1.2s timeout
+  // 1. Primary: Current TTC Live Map vehicle feed
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    // Attempt open public TTC vehicle feed if available, otherwise instant high-precision 60fps tracking
+    // The response uses the standard bustime-response.vehicle shape.
     const response = await fetch(
-      `/api/getvehicles?rt=${routeNum}&format=json`,
+      `/api/vehicle-positions?route=${routeNum}`,
       { cache: 'no-store', signal: controller.signal }
     );
     clearTimeout(timeoutId);
