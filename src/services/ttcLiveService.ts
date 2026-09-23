@@ -2,7 +2,7 @@
 // Live GPS tracking from official Toronto Transit Commission feeds
 // Vehicle positions come from the TTC BusTime feed.
 
-import { MOM_WORK_STOP, MOM_HOME_STOP } from '../data/ttc121Geometry';
+import { MOM_WORK_STOP } from '../data/ttc121Geometry';
 
 export interface RealTTCVehicle {
   id: string;
@@ -34,7 +34,7 @@ function isHeadingTowardPoint(lat: number, lng: number, targetLat: number, targe
   const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
   const bearingToStop = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
   const headingDifference = Math.abs((heading - bearingToStop + 540) % 360 - 180);
-  return headingDifference <= 90;
+  return headingDifference <= 60;
 }
 
 // Haversine distance formula in meters
@@ -60,8 +60,6 @@ export async function fetchLiveTTCVehicles(
   momStopLng: number = MOM_WORK_STOP.lng,
   travelDirection: 'to_work' | 'to_home' = 'to_work'
 ): Promise<RealTTCVehicle[]> {
-  const isGoingHome = travelDirection === 'to_home' || getDistanceMeters(momStopLat, momStopLng, MOM_HOME_STOP.lat, MOM_HOME_STOP.lng) < 100;
-  const expectedBusDir: 'West' | 'East' = isGoingHome ? 'West' : 'East';
 
   // BusTime requires a developer key, which is kept server-side in the Pages Function.
   // Never substitute fabricated vehicle locations when the live feed is unavailable.
@@ -87,9 +85,6 @@ export async function fetchLiveTTCVehicles(
 
       const heading = Number(v.hdg) || 0;
       const distM = getDistanceMeters(lat, lng, momStopLat, momStopLng);
-      const estimatedMinutes = Math.max(1, Math.round(distM / 250));
-      const arrivalClock = new Date(now.getTime() + estimatedMinutes * 60000)
-        .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const loadMap: Record<string, string> = {
         EMPTY: 'Plenty of Seats',
         HALF_EMPTY: 'Plenty of Seats',
@@ -103,7 +98,21 @@ export async function fetchLiveTTCVehicles(
         : rawDir.includes('east')
           ? 'East'
           : (heading > 180 && heading < 360 ? 'West' : 'East');
-      const isApproachingStop = distM <= 40 || isHeadingTowardPoint(lat, lng, momStopLat, momStopLng, heading);
+      const atStop = distM <= 40;
+      const isApproachingStop = atStop || isHeadingTowardPoint(lat, lng, momStopLat, momStopLng, heading);
+      const towardStop = isApproachingStop;
+      const reportedSpeedKmH = v.spd === undefined || v.spd === ''
+        ? null
+        : Math.round((Number(v.spd) || 0) * 1.60934);
+      const averageSpeedKmH = reportedSpeedKmH !== null && reportedSpeedKmH >= 8
+        ? Math.max(12, Math.min(26, reportedSpeedKmH * 0.65 + 16 * 0.35))
+        : 16;
+      const routeDistanceMeters = atStop ? 0 : Math.round(distM * 1.25);
+      const estimatedMinutes = atStop
+        ? 0
+        : Math.max(1, Math.ceil(routeDistanceMeters / (averageSpeedKmH * 1000 / 60)));
+      const arrivalClock = new Date(now.getTime() + estimatedMinutes * 60000)
+        .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const vidStr = String(v.vid || '').replace(/\\D/g, '');
       if (!vidStr) return [];
 
@@ -115,16 +124,16 @@ export async function fetchLiveTTCVehicles(
         lat,
         lng,
         heading,
-        speedKmH: v.spd === undefined || v.spd === '' ? null : Math.round((Number(v.spd) || 0) * 1.60934),
+        speedKmH: reportedSpeedKmH,
         direction,
         destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint Hospital' : 'Towards Union Station'),
         passengerLoad: loadMap[v.psgld] || 'Seats Available',
         minutesToMomStop: estimatedMinutes,
-        distanceMeters: distM,
+        distanceMeters: routeDistanceMeters,
         arrivalClockTime: arrivalClock,
         lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
         isClosest: false,
-        towardStop: direction === expectedBusDir,
+        towardStop,
         isApproachingStop,
       }];
     });
