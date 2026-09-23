@@ -115,7 +115,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
   // Key recognition landmarks for Mom (uncluttered)
   const getMainLandmark = (stopCode: string): string | null => {
-    if (stopCode === '6375' || stopCode === '11169') return '🏪 St. Lawrence Market';
+    if (stopCode === '6375') return '📍 Lower Jarvis';
+    if (stopCode === '11169') return '🏪 St. Lawrence Market';
     if (stopCode === '16754' || stopCode === '246') return '🚉 Union Station';
     return null;
   };
@@ -715,7 +716,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const selectedVehicle = liveVehicles.find((v) => v.id === selectedVehicleId) || (liveVehicles.length > 0 ? liveVehicles[0] : null);
 
   return (
-    <div className="relative flex flex-col w-full h-full min-h-screen bg-[#F2F2F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans select-none overflow-hidden">
+    <div className="relative flex flex-col w-full h-full min-h-0 bg-[#F2F2F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans select-none overflow-hidden">
       
       {/* ============================================================== */}
       {/* 1. TRANSLUCENT TOP HEADER (Glass Blur & High-Legibility)        */}
@@ -801,11 +802,11 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       {/* ============================================================== */}
       {/* 2. HORIZONTAL LIVE BUS CAROUSEL CHIPS                          */}
       {/* ============================================================== */}
-      <div className="z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-black/5 dark:border-white/10 px-3 py-1.5 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
+      <div className="z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-black/5 dark:border-white/10 px-3 py-1.5 flex items-center gap-2 overflow-x-auto overscroll-x-contain text-xs scrollbar-none">
         {/* Frame All Buses Button */}
         <button
           onClick={fitAllBuses}
-          className="px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs border border-black/5 dark:border-white/10"
+          className="min-h-10 px-2.5 py-2 rounded-full bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs border border-black/5 dark:border-white/10"
         >
           <Crosshair className="w-3.5 h-3.5 text-blue-500" />
           <span>Show All ({liveVehicles.length} Buses)</span>
@@ -820,7 +821,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             <button
               key={v.id}
               onClick={() => focusVehicle(v)}
-              className={`px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-2xs ${
+              className={`min-h-10 px-3 py-2 rounded-full font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-2xs ${
                 isSelected
                   ? 'bg-blue-600 text-white ring-2 ring-blue-400/50 shadow-md'
                   : isPrimary
@@ -838,7 +839,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         {/* Mom's Stop Quick Chip */}
         <button
           onClick={focusMomStop}
-          className="px-3 py-1 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5 shrink-0 border border-emerald-500/30 transition-all shadow-2xs"
+          className="min-h-10 px-3 py-2 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1.5 shrink-0 border border-emerald-500/30 transition-all shadow-2xs"
         >
           <span>⭐</span>
           <span>Your Stop (#{activeMomStop.code})</span>
@@ -847,7 +848,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         {/* Full Route Chip */}
         <button
           onClick={fitFullRoute}
-          className="px-2.5 py-1 rounded-full bg-white/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1 shrink-0 border border-black/5 dark:border-white/10 hover:text-slate-900 dark:hover:text-white transition-colors text-[11px]"
+          className="min-h-10 px-2.5 py-2 rounded-full bg-white/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-semibold flex items-center gap-1 shrink-0 border border-black/5 dark:border-white/10 hover:text-slate-900 dark:hover:text-white transition-colors text-[11px]"
         >
           <Maximize2 className="w-2.5 h-2.5" />
           <span>Full Route</span>
@@ -857,7 +858,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       {/* ============================================================== */}
       {/* 3. MAIN MAP WORKSPACE (REALISTIC 3D BUILDINGS & AERIAL VIEW)   */}
       {/* ============================================================== */}
-      <div className="relative flex-1 w-full h-[calc(100vh-85px)] overflow-hidden">
+      <div className="relative flex-1 min-h-0 w-full overflow-hidden">
         {/* Leaflet Map Container */}
         <div ref={mapContainerRef} className="w-full h-full absolute inset-0 z-0 bg-[#E5E0D8]" />
 
@@ -914,7 +915,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
         {/* Bottom Floating Card: Selected Bus Details (Transit Sheet) */}
         {selectedVehicle && !selectedStop && (
-          <div className="absolute bottom-4 left-3 right-3 sm:left-4 sm:w-96 z-[500] bg-white/90 dark:bg-slate-900/90 border border-black/10 dark:border-white/15 rounded-3xl p-4 shadow-2xl backdrop-blur-2xl text-slate-900 dark:text-white">
+          <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:w-96 z-[500] bg-white/90 dark:bg-slate-900/90 border border-black/10 dark:border-white/15 rounded-3xl p-4 shadow-2xl backdrop-blur-2xl text-slate-900 dark:text-white">
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#FF3B30] to-[#D70015] text-white flex flex-col items-center justify-center font-black shadow-md shrink-0">
@@ -1058,12 +1059,12 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         )}
 
         {/* Floating Navigation & Zoom Controls (Bottom-Right) */}
-        <div className="absolute right-3 bottom-4 z-[500] flex flex-col items-center gap-2">
+        <div className="absolute right-3 z-[500] flex flex-col items-center gap-2 ${selectedVehicle || selectedStop ? 'bottom-[14.5rem] sm:bottom-4' : 'bottom-4'}">
           {/* Zoom Buttons Group */}
           <div className="flex flex-col items-center bg-white/85 dark:bg-slate-900/85 p-1 rounded-2xl border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl">
             <button
               onClick={handleZoomIn}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
@@ -1081,7 +1082,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {/* Quick Fit Camera Button */}
           <button
             onClick={fitAllBuses}
-            className="w-10 h-10 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+            className="w-11 h-11 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
             title="Recenter and Fit All Buses"
           >
             <Crosshair className="w-4 h-4" />
