@@ -17,6 +17,7 @@ import {
   RefreshCw,
   ArrowLeftRight,
   Maximize2,
+  Map,
   Sliders,
   Bell,
   Compass,
