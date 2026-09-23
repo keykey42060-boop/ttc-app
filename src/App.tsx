@@ -6,7 +6,7 @@ import { BigTextView } from './components/BigTextView';
 import { AccessibleMap } from './components/AccessibleMap';
 import { NotificationPrototypeModal } from './components/NotificationPrototypeModal';
 import { TestWithHerPanel } from './components/TestWithHerPanel';
-import { Volume2, Map, Sliders, Bell, Phone } from 'lucide-react';
+import { Volume2, Map as MapIcon, Sliders, Bell, Phone } from 'lucide-react';
 
 const DEFAULT_SETTINGS: AccessibilitySettings = {
   textSize: 'xlarge',
@@ -261,7 +261,7 @@ export default function App() {
               : isNight ? 'text-slate-500' : 'text-slate-400'
           }`}
         >
-          <Map className="w-5 h-5 stroke-[2.5]" />
+          <MapIcon className="w-5 h-5 stroke-[2.5]" />
           <span className="text-[10px] font-bold leading-none">Map</span>
         </button>
 

@@ -27,7 +27,8 @@ import {
   Clock,
   Sparkles,
   Zap,
-  Layers
+  Layers,
+  Map as MapIcon
 } from 'lucide-react';
 
 interface AccessibleMapProps {
@@ -853,7 +854,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             }`}
             title="Detailed Google Maps View with Street Geometry, Parks & Buildings"
           >
-            <Map className="w-3.5 h-3.5" />
+            <MapIcon className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Detailed</span>
           </button>
           <button

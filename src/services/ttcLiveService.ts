@@ -96,7 +96,7 @@ export async function fetchLiveTTCVehicles(
 
     // Attempt open public TTC vehicle feed if available, otherwise instant high-precision 60fps tracking
     const response = await fetch(
-      `https://bustime.ttc.ca/api/v3/getvehicles?rt=${routeNum}&format=json`,
+      `/api/getvehicles?rt=${routeNum}&format=json`,
       { cache: 'no-store', signal: controller.signal }
     );
     clearTimeout(timeoutId);

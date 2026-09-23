@@ -1,6 +1,6 @@
 import React from 'react';
 import { BusRouteConfig, BusState, AccessibilitySettings } from '../types/bus';
-import { Volume2, Map, Bell, Phone, Clock, ArrowRight, CheckCircle2, AlertCircle, Compass, Sparkles, Navigation } from 'lucide-react';
+import { Volume2, Map as MapIcon, Bell, Phone, Clock, ArrowRight, CheckCircle2, AlertCircle, Compass, Sparkles, Navigation } from 'lucide-react';
 
 interface BigTextViewProps {
   route: BusRouteConfig;
@@ -256,7 +256,7 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
           }`}
           aria-label="Open detailed map view"
         >
-          <Map className="w-8 h-8 text-red-600 stroke-[2.5]" />
+          <MapIcon className="w-8 h-8 text-red-600 stroke-[2.5]" />
           <div className="text-left">
             <span className="block leading-tight">See Live Map</span>
             <span className="text-xs font-bold opacity-75">Detailed TTC Map with Direction Arrows</span>
