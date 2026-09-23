@@ -101,18 +101,18 @@ export default function App() {
       {activeToast && (
         <aside
           aria-live="polite"
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-lg p-4 rounded-2xl bg-red-600 text-white shadow-2xl border-2 border-white flex items-center justify-between gap-3 animate-bounce"
+          className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-11/12 max-w-lg p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/95 text-slate-900 sm:bg-red-600 sm:text-white shadow-lg sm:shadow-2xl border border-red-200 sm:border-2 sm:border-white flex items-center justify-between gap-2 sm:gap-3 animate-bounce backdrop-blur-sm"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🚌</span>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="text-2xl sm:text-3xl">🚌</span>
             <div>
-              <p className="font-black text-base leading-tight">{activeToast.title}</p>
-              <p className="text-xs text-red-100 mt-0.5">{activeToast.body}</p>
+              <p className="font-black text-sm sm:text-base leading-tight">{activeToast.title}</p>
+              <p className="text-[11px] sm:text-xs text-slate-600 sm:text-red-100 mt-0.5">{activeToast.body}</p>
             </div>
           </div>
           <button
             onClick={() => setActiveToast(null)}
-            className="px-3 py-1.5 rounded-lg bg-black/20 hover:bg-black/30 font-bold text-xs"
+            className="shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-slate-900/10 sm:bg-black/20 hover:bg-slate-900/20 sm:hover:bg-black/30 font-bold text-[11px] sm:text-xs"
           >
             Dismiss
           </button>
