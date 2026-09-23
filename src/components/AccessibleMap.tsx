@@ -336,7 +336,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
           <!-- Directional arrow fixed to the front/nose of the bus -->
           <div class="realistic-bus-heading-needle" style="position: absolute; left: 0; right: 0; top: 0; height: 12px; display: flex; justify-content: center; pointer-events: none; z-index: 3;">
-            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #FACC15; position: absolute; top: -8px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
+            <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -4px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
           </div>
         </div>
       </div>
