@@ -701,10 +701,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       {/* ============================================================== */}
       {/* 1. TRANSLUCENT TOP HEADER (Glass Blur & High-Legibility)        */}
       {/* ============================================================== */}
-      <header className="z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 shadow-xs border-b border-black/5 dark:border-white/10 transition-colors">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <header className="z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl px-2.5 sm:px-4 py-2 flex items-center justify-between gap-1.5 shadow-xs border-b border-black/5 dark:border-white/10 transition-colors">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
           {/* TTC Iconic Crest */}
-          <div className="flex items-center gap-1.5 bg-[#FF3B30] text-white px-2.5 py-0.5 rounded-lg shadow-xs font-black text-xs sm:text-sm uppercase tracking-wide">
+          <div className="flex items-center gap-1.5 bg-[#FF3B30] text-white px-2.5 py-0.5 rounded-lg shadow-xs font-black text-xs sm:text-sm uppercase tracking-wide shrink-0">
             <span>TTC 121</span>
           </div>
 
@@ -716,12 +716,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onToggleCommute && (
             <button
               onClick={() => onToggleCommute(isGoingToWork ? 'to_home' : 'to_work')}
-              className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition-all shadow-xs border border-black/5 dark:border-white/10"
+              className="px-2 sm:px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition-all shadow-xs border border-black/5 dark:border-white/10 shrink-0"
               title="Switch Morning Work / Afternoon Home"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5 text-blue-500" />
-              <span>{isGoingToWork ? 'Going Home' : 'Going to Work'}</span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold">
+              <ArrowLeftRight className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span className="hidden sm:inline">{isGoingToWork ? 'Going Home' : 'Going to Work'}</span>
+              <span className="sm:hidden">{isGoingToWork ? 'Home' : 'Work'}</span>
+              <span className="hidden lg:inline text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold">
                 {isGoingToWork ? '(Stop #15583)' : '(Stop #16754)'}
               </span>
             </button>
@@ -736,21 +737,21 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         </div>
 
         {/* Right Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {/* Big Text View Button for Mom */}
           <button
             onClick={onSwitchToBigText}
-            className="px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
+            className="px-2 sm:px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
             title="Switch to Senior Big Text View"
           >
-            <span className="text-sm">🔤</span>
-            <span>Big Text</span>
+            <Volume2 className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="hidden sm:inline">Big Text</span>
           </button>
 
           {/* Speech */}
           <button
             onClick={onSpeak}
-            className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
+            className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
             title="Read Arrival Aloud"
           >
             <Volume2 className="w-4 h-4 text-blue-500" />
@@ -760,7 +761,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onOpenNotifications && (
             <button
               onClick={onOpenNotifications}
-              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
               title="Notification Settings"
             >
               <Bell className="w-4 h-4 text-amber-500" />
@@ -769,7 +770,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onOpenCaregiver && (
             <button
               onClick={onOpenCaregiver}
-              className="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
               title="Caregiver Testing Panel"
             >
               <Sliders className="w-4 h-4" />
@@ -845,39 +846,39 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         <div className="absolute top-3 right-3 z-[500] flex items-center bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 rounded-2xl p-1 shadow-xl backdrop-blur-xl text-xs font-bold text-slate-600 dark:text-slate-300">
           <button
             onClick={() => setMapTheme('detailed')}
-            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
               mapTheme === 'detailed'
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Detailed Google Maps View with Street Geometry, Parks & Buildings"
           >
-            <span>🗺️</span>
-            <span>Detailed Map</span>
+            <Map className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Detailed</span>
           </button>
           <button
             onClick={() => setMapTheme('satellite')}
-            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
               mapTheme === 'satellite'
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Real Photographic Satellite View with Street Labels"
           >
-            <span>🛰️</span>
-            <span>Satellite Photo</span>
+            <Layers className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Satellite</span>
           </button>
           <button
             onClick={() => setMapTheme('contrast')}
-            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
               mapTheme === 'contrast'
                 ? 'bg-blue-600 text-white shadow-sm'
                 : 'hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Clean High-Contrast Transit View"
           >
-            <span>🧭</span>
-            <span>Clean Map</span>
+            <Compass className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Clean</span>
           </button>
         </div>
 
