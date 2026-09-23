@@ -739,7 +739,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const selectedVehicle = liveVehicles.find((v) => v.id === selectedVehicleId) || (liveVehicles.length > 0 ? liveVehicles[0] : null);
 
   return (
-    <div className="relative flex flex-col w-full h-full min-h-0 bg-[#F2F2F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans select-none overflow-hidden">
+    <div className="relative flex flex-col flex-1 w-full min-h-0 bg-[#F2F2F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans select-none overflow-hidden">
       
       {/* ============================================================== */}
       {/* 1. TRANSLUCENT TOP HEADER (Glass Blur & High-Legibility)        */}
