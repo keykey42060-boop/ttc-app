@@ -125,7 +125,7 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
             <span className="text-3xl">🚏</span>
             <div>
               <p className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                Mom's Boarding Stop
+                Your Boarding Stop
               </p>
               <p className="text-lg sm:text-xl font-black">
                 {route.myStopName}
