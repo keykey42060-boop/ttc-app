@@ -364,11 +364,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
   // Realistic Mom's Stop Beacon
   const createMomStopIcon = (stopCode: string, isSelected: boolean) => {
+    const isUnionStationStop = stopCode === '16754' || stopCode === '246';
+    const landmarkSuffix = isUnionStationStop ? ' · 🚉 Union Station' : '';
     return `
       <div style="position: relative; width: 104px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; cursor: pointer;">
         <!-- Realistic TTC Stop Sign Banner -->
         <div style="padding: 3px 9px; border-radius: 9999px; font-size: 10.5px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: linear-gradient(135deg, #047857 0%, #065F46 100%); color: #FFFFFF; border: 1.5px solid #FDE047; box-shadow: 0 4px 14px rgba(4, 120, 87, 0.45); margin-bottom: 3px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-          <span style="color: #FDE047;">⭐</span> Your Stop #${stopCode}
+          <span style="color: #FDE047;">⭐</span> Your Stop #${stopCode}${landmarkSuffix}
         </div>
 
         <!-- 28px Realistic Transit Pole Puck -->
