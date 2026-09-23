@@ -551,7 +551,11 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         : `<strong>${stop.name}</strong><br><span style="font-size:10px;color:#8E8E93">TTC Stop #${stop.code}</span>`;
       stopMarker.bindTooltip(tooltipText, {
         direction: 'top',
-        offset: [0, isLandmark ? -16 : -5],
+        offset: isLandmark
+          ? stop.code === '11169'
+            ? [-36, -42]
+            : [-22, -36]
+          : [0, -5],
         permanent: isLandmark,
         opacity: 1,
         className: isLandmark ? 'compact-stop-tooltip landmark-stop-tooltip' : 'compact-stop-tooltip',
