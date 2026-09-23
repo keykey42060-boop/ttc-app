@@ -1,6 +1,6 @@
 // Real-time TTC Route 121 Vehicle Location Service
 // Live GPS tracking from official Toronto Transit Commission feeds
-// With continuous 60 FPS dead-reckoning & sub-2-second sync for ultra-fluid real-time motion
+// Vehicle positions come from the TTC BusTime feed.
 
 import { MOM_WORK_STOP, MOM_HOME_STOP } from '../data/ttc121Geometry';
 
@@ -39,9 +39,7 @@ export function getDistanceMeters(lat1: number, lon1: number, lat2: number, lon2
   return Math.round(R * c);
 }
 
-/**
- * Fetch real-time vehicles from TTC API with rapid 1.5s timeout for zero lag
- */
+/** Fetches real-time vehicles through the same-origin Pages Function. */
 export async function fetchLiveTTCVehicles(
   routeNum: string = '121',
   momStopLat: number = MOM_WORK_STOP.lat,
