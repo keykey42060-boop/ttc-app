@@ -22,38 +22,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   </head>
   <body>
-    <div id="root">
-      <main id="startup-message" style="font: 16px system-ui, sans-serif; padding: 24px; color: #111827">
-        Starting ClearRide…
-      </main>
-    </div>
-    <script>
-      const showStartupError = (message) => {
-        const root = document.getElementById('root');
-        if (!root) return;
-        const notice = document.createElement('main');
-        notice.setAttribute('role', 'alert');
-        notice.style.cssText = 'font: 16px system-ui, sans-serif; padding: 24px; color: #991b1b';
-        notice.textContent = 'ClearRide could not start: ' + message;
-        root.replaceChildren(notice);
-      };
-      window.addEventListener('error', (event) => {
-        if (document.getElementById('startup-message')) {
-          showStartupError(event.message || 'The app script failed to load.');
-        }
-      });
-      window.addEventListener('unhandledrejection', (event) => {
-        if (document.getElementById('startup-message')) {
-          const reason = event.reason;
-          showStartupError(reason instanceof Error ? reason.message : String(reason));
-        }
-      });
-      window.setTimeout(() => {
-        if (document.getElementById('startup-message')) {
-          showStartupError('The app did not start. Check the latest deployment and refresh.');
-        }
-      }, 7000);
-    </script>
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
