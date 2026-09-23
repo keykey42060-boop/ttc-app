@@ -102,7 +102,6 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const [selectedStop, setSelectedStop] = useState<TTCStopInfo | null>(null);
   const [followBusId, setFollowBusId] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(15.5);
-  const [fpsCounter, setFpsCounter] = useState<number>(60);
 
   const isGoingToWork = route.direction === 'to_work';
   const activeMomStop = isGoingToWork ? MOM_WORK_STOP : MOM_HOME_STOP;
@@ -180,7 +179,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         activeMomStop.lng,
         route.direction
       );
-      setLiveVehicles(vehicles || []);
+      const nextVehicles = vehicles || [];
+      setLiveVehicles((previous) => JSON.stringify(previous) === JSON.stringify(nextVehicles) ? previous : nextVehicles);
 
       // Keep the actual TTC coordinates. Route snapping can move a real bus off its reported GPS position.
       const anims = animStatesRef.current;
@@ -237,8 +237,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           state.speedKmH = vehicle.speedKmH;
         }
       });
-      const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];
-      setLastFeedSync(newestUpdate ? `TTC updated ${Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000))}s ago` : 'Waiting for TTC vehicles');
+      const newestUpdate = nextVehicles.map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];
+      const ageSeconds = newestUpdate ? Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000)) : 0;
+      const feedSyncLabel = newestUpdate ? `TTC updated ${Math.floor(ageSeconds / 10) * 10}s ago` : 'Waiting for TTC vehicles';
+      setLastFeedSync((previous) => previous === feedSyncLabel ? previous : feedSyncLabel);
     } catch (err) {
       console.error('TTC feed refresh error:', err);
       setLiveVehicles([]);
@@ -260,20 +262,9 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   // 60 FPS HARDWARE-ACCELERATED REQUESTANIMATIONFRAME GLIDE ENGINE
   // ==============================================================
   useEffect(() => {
-    let frameCount = 0;
-    let lastFpsCheck = performance.now();
-
     const animateLoop = (time: number) => {
       const dt = Math.min(0.1, (time - lastFrameTimeRef.current) / 1000); // delta in seconds
       lastFrameTimeRef.current = time;
-
-      // Track FPS
-      frameCount++;
-      if (time - lastFpsCheck >= 1000) {
-        setFpsCounter(Math.round((frameCount * 1000) / (time - lastFpsCheck)));
-        frameCount = 0;
-        lastFpsCheck = time;
-      }
 
       const map = mapInstanceRef.current;
       const anims = animStatesRef.current;
@@ -632,7 +623,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, !v.towardStop ? v.direction : v.isApproachingStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, !v.towardStop ? 'Heading your way' : v.isApproachingStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -874,7 +865,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             >
               <span className={`w-2 h-2 rounded-full ${isWorkBus ? 'bg-blue-500' : 'bg-orange-500'}`} />
               <span>#{v.cleanVid}</span>
-              <span className="font-extrabold text-[11px] opacity-90">{!v.towardStop ? `(${v.direction})` : v.isApproachingStop ? `(${v.minutesToMomStop}m)` : '(Away)'}</span>
+              <span className="font-extrabold text-[11px] opacity-90">{!v.towardStop ? '(Heading your way)' : v.isApproachingStop ? `(${v.minutesToMomStop}m)` : '(Away)'}</span>
             </button>
           );
         })}
@@ -1007,7 +998,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
                   <Compass className="w-3 h-3 text-blue-500" /> Heading
                 </div>
-                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{selectedVehicle.direction} ({selectedVehicle.heading}°)</div>
+                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">Heading your way ({selectedVehicle.heading}°)</div>
               </div>
               <div className="bg-slate-100/70 dark:bg-slate-800/60 p-2 rounded-xl">
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Seats</div>
