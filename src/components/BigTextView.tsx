@@ -35,7 +35,7 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
   const customMinutes = settings.customNotificationMinutes || [10, 5];
 
   return (
-    <div className={`flex flex-col w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 ${
+    <div className={`flex flex-col w-full max-w-4xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 ${
       isYellowContrast ? 'text-yellow-300' : isNight ? 'text-slate-100' : 'text-slate-900'
     }`}>
       {/* COMMUTE DIRECTION TOGGLE (Mom's 2 Routes: To Work / Coming Home) */}
@@ -120,14 +120,14 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
         </div>
 
         {/* BOARDING STOP NOTIFICATION */}
-        <div className="mt-4 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🚏</span>
+        <div className="mt-4 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="text-3xl shrink-0">🚏</span>
             <div>
               <p className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Your Boarding Stop
               </p>
-              <p className="text-lg sm:text-xl font-black">
+              <p className="text-lg sm:text-xl font-black break-words">
                 {route.myStopName}
               </p>
             </div>
@@ -135,7 +135,7 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
 
           <button
             onClick={onOpenNotifications}
-            className="px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-extrabold text-xs flex items-center gap-1.5 hover:bg-amber-200 transition-colors"
+            className="min-h-11 w-full justify-center px-3 py-2 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-extrabold text-xs flex items-center gap-1.5 hover:bg-amber-200 transition-colors sm:w-auto shrink-0"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Alerts: {customMinutes.map(m => `${m}m`).join(', ')}</span>
