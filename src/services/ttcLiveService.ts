@@ -77,6 +77,42 @@ function interpolatePolyline(pts: [number, number][], progress: number): { lat: 
   return { lat, lng, heading };
 }
 
+function nearestPolylineIndex(pts: [number, number][], lat: number, lng: number): number {
+  let nearestIndex = 0;
+  let nearestDistance = Infinity;
+
+  pts.forEach(([pointLat, pointLng], index) => {
+    const distance = getDistanceMeters(lat, lng, pointLat, pointLng);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+
+  return nearestIndex;
+}
+
+function getRouteDistanceToStop(
+  lat: number,
+  lng: number,
+  stopLat: number,
+  stopLng: number,
+  direction: 'East' | 'West'
+): number {
+  const points = direction === 'West' ? ROUTE_121_WESTBOUND_POLYLINE : ROUTE_121_EASTBOUND_POLYLINE;
+  const vehicleIndex = nearestPolylineIndex(points, lat, lng);
+  const stopIndex = nearestPolylineIndex(points, stopLat, stopLng);
+  const start = Math.min(vehicleIndex, stopIndex);
+  const end = Math.max(vehicleIndex, stopIndex);
+
+  let distance = 0;
+  for (let index = start; index < end; index += 1) {
+    distance += getDistanceMeters(points[index][0], points[index][1], points[index + 1][0], points[index + 1][1]);
+  }
+
+  return distance;
+}
+
 /**
  * Fetch real-time vehicles from the same live feed used by TTC Live Map
  */
@@ -112,8 +148,13 @@ export async function fetchLiveTTCVehicles(
           const lat = parseFloat(v.lat);
           const lng = parseFloat(v.lon);
           const heading = parseInt(v.hdg, 10) || 0;
-          const distM = getDistanceMeters(lat, lng, momStopLat, momStopLng);
-          const estimatedMinutes = Math.max(1, Math.round(distM / 250));
+          const rawDir = (v.rtdir || '').toLowerCase();
+          const direction: 'East' | 'West' = rawDir.includes('west') ? 'West' : rawDir.includes('east') ? 'East' : (heading > 150 && heading < 330) ? 'West' : 'East';
+          const routeDistanceM = getRouteDistanceToStop(lat, lng, momStopLat, momStopLng, direction);
+          const speedKmH = Math.round(parseFloat(v.spd) * 1.60934) || 0;
+          const effectiveSpeedKmH = Math.max(speedKmH, 18);
+          const estimatedMinutes = Math.max(1, Math.ceil(routeDistanceM / (effectiveSpeedKmH * 1000 / 60)));
+          const distM = routeDistanceM;
           const arrivalDate = new Date(now.getTime() + estimatedMinutes * 60000);
           const arrivalClock = arrivalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
@@ -124,8 +165,6 @@ export async function fetchLiveTTCVehicles(
             FULL: 'Crowded',
           };
 
-          const rawDir = (v.rtdir || '').toLowerCase();
-          const direction: 'East' | 'West' = rawDir.includes('west') ? 'West' : rawDir.includes('east') ? 'East' : (heading > 150 && heading < 330) ? 'West' : 'East';
           const vidStr = String(v.vid || '').replace(/\D/g, '');
 
           return {
@@ -136,7 +175,7 @@ export async function fetchLiveTTCVehicles(
             lat,
             lng,
             heading,
-            speedKmH: Math.round(parseFloat(v.spd) * 1.60934) || 0,
+            speedKmH,
             direction,
             destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint' : 'Towards Union Station'),
             passengerLoad: loadMap[v.psgld] || 'Seats Available',
