@@ -1,4 +1,5 @@
-import {Component, StrictMode, createRoot, type ErrorInfo, type ReactNode} from 'react';
+import {Component, StrictMode, type ErrorInfo, type ReactNode} from 'react';
+import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
@@ -20,7 +21,6 @@ class AppErrorBoundary extends Component<{children: ReactNode}, ErrorBoundarySta
       return (
         <main role="alert" style={{fontFamily: 'system-ui, sans-serif', padding: 32, color: '#111827'}}>
           <h1>ClearRide couldn't load</h1>
-          <p>{this.state.error.message}</p>
           <p>Refresh the page to try again.</p>
         </main>
       );
