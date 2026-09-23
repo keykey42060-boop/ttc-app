@@ -155,7 +155,10 @@ export async function fetchLiveTTCVehicles(
           const speedKmH = Math.round(parseFloat(v.spd) * 1.60934) || 0;
           const effectiveSpeedKmH = Math.max(speedKmH, 18);
           const travelMinutes = Math.max(1, Math.ceil(routeDistanceM / (effectiveSpeedKmH * 1000 / 60)));
-          const estimatedMinutes = routeEstimate.isApproaching ? travelMinutes : Math.max(30, travelMinutes + 30);
+          const baselineMinutes = Math.max(1, Math.round(getDistanceMeters(lat, lng, momStopLat, momStopLng) / 250));
+          const estimatedMinutes = routeEstimate.isApproaching
+            ? travelMinutes < 20 ? travelMinutes : baselineMinutes
+            : Math.max(20, baselineMinutes + 10);
           const distM = routeDistanceM;
           const arrivalDate = new Date(now.getTime() + estimatedMinutes * 60000);
           const arrivalClock = arrivalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
