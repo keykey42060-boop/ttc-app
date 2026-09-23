@@ -12,7 +12,7 @@ export interface RealTTCVehicle {
   lat: number;
   lng: number;
   heading: number;
-  speedKmH: number;
+  speedKmH: number | null;
   direction: 'East' | 'West';
   destination: string;
   passengerLoad: string;
@@ -100,7 +100,7 @@ export async function fetchLiveTTCVehicles(
         lat,
         lng,
         heading,
-        speedKmH: Math.round((Number(v.spd) || 0) * 1.60934),
+        speedKmH: v.spd === undefined || v.spd === '' ? null : Math.round((Number(v.spd) || 0) * 1.60934),
         direction,
         destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint Hospital' : 'Towards Union Station'),
         passengerLoad: loadMap[v.psgld] || 'Seats Available',
