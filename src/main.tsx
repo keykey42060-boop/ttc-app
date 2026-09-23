@@ -21,7 +21,6 @@ class AppErrorBoundary extends Component<{children: ReactNode}, ErrorBoundarySta
       return (
         <main role="alert" style={{fontFamily: 'system-ui, sans-serif', padding: 32, color: '#111827'}}>
           <h1>ClearRide couldn't load</h1>
-          <p>{this.state.error?.message}</p>
           <p>Refresh the page to try again.</p>
         </main>
       );
