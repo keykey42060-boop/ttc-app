@@ -2,12 +2,7 @@
 // Live GPS tracking from official Toronto Transit Commission feeds
 // With continuous 60 FPS dead-reckoning & sub-2-second sync for ultra-fluid real-time motion
 
-import {
-  ROUTE_121_EASTBOUND_POLYLINE,
-  ROUTE_121_WESTBOUND_POLYLINE,
-  MOM_WORK_STOP,
-  MOM_HOME_STOP,
-} from '../data/ttc121Geometry';
+import { MOM_WORK_STOP, MOM_HOME_STOP } from '../data/ttc121Geometry';
 
 export interface RealTTCVehicle {
   id: string;
@@ -42,39 +37,6 @@ export function getDistanceMeters(lat1: number, lon1: number, lat2: number, lon2
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return Math.round(R * c);
-}
-
-// Calculate bearing in degrees between two coordinates
-export function calculateBearing(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const lat1Rad = (lat1 * Math.PI) / 180;
-  const lat2Rad = (lat2 * Math.PI) / 180;
-  const y = Math.sin(dLon) * Math.cos(lat2Rad);
-  const x =
-    Math.cos(lat1Rad) * Math.sin(lat2Rad) -
-    Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
-  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-}
-
-// High-precision polyline interpolation for smooth vehicle gliding
-function interpolatePolyline(pts: [number, number][], progress: number): { lat: number; lng: number; heading: number } {
-  if (!pts || pts.length === 0) return { lat: 43.646, lng: -79.378, heading: 90 };
-  if (pts.length === 1) return { lat: pts[0][0], lng: pts[0][1], heading: 90 };
-
-  const clamped = Math.max(0, Math.min(1, progress));
-  const segmentCount = pts.length - 1;
-  const globalSegment = clamped * segmentCount;
-  const index = Math.min(Math.floor(globalSegment), segmentCount - 1);
-  const frac = globalSegment - index;
-
-  const pA = pts[index];
-  const pB = pts[index + 1];
-
-  const lat = pA[0] + (pB[0] - pA[0]) * frac;
-  const lng = pA[1] + (pB[1] - pA[1]) * frac;
-  const heading = Math.round(calculateBearing(pA[0], pA[1], pB[0], pB[1]));
-
-  return { lat, lng, heading };
 }
 
 /**
@@ -163,4 +125,3 @@ export async function fetchLiveTTCVehicles(
   }
 }
 
-}
