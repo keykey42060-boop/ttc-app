@@ -103,6 +103,7 @@ export async function fetchLiveTTCVehicles(
         : rawDir.includes('east')
           ? 'East'
           : (heading > 180 && heading < 360 ? 'West' : 'East');
+      const isApproachingStop = distM <= 40 || isHeadingTowardPoint(lat, lng, momStopLat, momStopLng, heading);
       const vidStr = String(v.vid || '').replace(/\\D/g, '');
       if (!vidStr) return [];
 
