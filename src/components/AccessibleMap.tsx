@@ -170,37 +170,38 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         activeMomStop.lng,
         route.direction
       );
-      if (vehicles && vehicles.length > 0) {
-        setLiveVehicles(vehicles);
+      setLiveVehicles(vehicles || []);
 
-        // Update animation target state
-        const anims = animStatesRef.current;
-        const now = performance.now();
+      // Keep the actual TTC coordinates. Route snapping can move a real bus off its reported GPS position.
+      const anims = animStatesRef.current;
+      const now = performance.now();
+      const currentIds = new Set((vehicles || []).map((vehicle) => vehicle.id));
 
-        vehicles.forEach((v) => {
-          const snapped = snapPointToRoute(v.lat, v.lng, v.direction);
-          const state = anims.get(v.id);
+      anims.forEach((_state, id) => {
+        if (!currentIds.has(id)) anims.delete(id);
+      });
 
-          if (!state) {
-            anims.set(v.id, {
-              currentLat: snapped.lat,
-              currentLng: snapped.lng,
-              targetLat: snapped.lat,
-              targetLng: snapped.lng,
-              currentHeading: snapped.heading || v.heading,
-              targetHeading: snapped.heading || v.heading,
-              speedKmH: v.speedKmH || 22,
-              lastUpdate: now,
-            });
-          } else {
-            state.targetLat = snapped.lat;
-            state.targetLng = snapped.lng;
-            state.targetHeading = snapped.heading || v.heading;
-            state.speedKmH = v.speedKmH || 22;
-            state.lastUpdate = now;
-          }
-        });
-      }
+      (vehicles || []).forEach((vehicle) => {
+        const state = anims.get(vehicle.id);
+        if (!state) {
+          anims.set(vehicle.id, {
+            currentLat: vehicle.lat,
+            currentLng: vehicle.lng,
+            targetLat: vehicle.lat,
+            targetLng: vehicle.lng,
+            currentHeading: vehicle.heading,
+            targetHeading: vehicle.heading,
+            speedKmH: vehicle.speedKmH,
+            lastUpdate: now,
+          });
+        } else {
+          state.targetLat = vehicle.lat;
+          state.targetLng = vehicle.lng;
+          state.targetHeading = vehicle.heading;
+          state.speedKmH = vehicle.speedKmH;
+          state.lastUpdate = now;
+        }
+      });
       setLastFeedSync(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }));
     } catch (err) {
       console.error('Fast feed refresh error:', err);
