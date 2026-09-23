@@ -106,6 +106,23 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const isGoingToWork = route.direction === 'to_work';
   const activeMomStop = isGoingToWork ? MOM_WORK_STOP : MOM_HOME_STOP;
 
+  // Keep the user-facing marker on the nearest mapped Route 121 street segment.
+  // The original TTC coordinates remain attached to the stop object for ETAs.
+  const getStopDisplayPosition = (stop: TTCStopInfo): [number, number] => {
+    const eastbound = snapPointToRoute(stop.lat, stop.lng, 'East');
+    const westbound = snapPointToRoute(stop.lat, stop.lng, 'West');
+    const eastboundDistance = getDistanceMeters(stop.lat, stop.lng, eastbound.lat, eastbound.lng);
+    const westboundDistance = getDistanceMeters(stop.lat, stop.lng, westbound.lat, westbound.lng);
+    const closest = eastboundDistance <= westboundDistance
+      ? { point: eastbound, distance: eastboundDistance }
+      : { point: westbound, distance: westboundDistance };
+
+    // Avoid moving records that do not match the mapped route closely.
+    return closest.distance <= 80
+      ? [closest.point.lat, closest.point.lng]
+      : [stop.lat, stop.lng];
+  };
+
   // ==============================================================
   // BASEMAP DEFINITIONS - DETAILED GOOGLE MAPS & SATELLITE TILES
   // ==============================================================
@@ -443,7 +460,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     lineSecondaryRef.current = lineSecondary;
 
     // Mom's Boarding Stop Beacon
-    const momMarker = L.marker([activeMomStop.lat, activeMomStop.lng], {
+    const momMarker = L.marker(getStopDisplayPosition(activeMomStop), {
       icon: L.divIcon({
         html: createMomStopIcon(activeMomStop.code, false),
         className: 'mom-stop-beacon-marker',
@@ -521,7 +538,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     }
 
     if (momStopMarkerRef.current) {
-      momStopMarkerRef.current.setLatLng([activeMomStop.lat, activeMomStop.lng]);
+      momStopMarkerRef.current.setLatLng(getStopDisplayPosition(activeMomStop));
       momStopMarkerRef.current.setIcon(
         L.divIcon({
           html: createMomStopIcon(activeMomStop.code, false),
@@ -542,7 +559,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const landmark = getMainLandmark(stop.code);
       const isLandmark = Boolean(landmark);
 
-      const stopMarker = L.marker([stop.lat, stop.lng], {
+      const stopMarker = L.marker(getStopDisplayPosition(stop), {
         icon: L.divIcon({
           html: createStopIcon(stop, landmark),
           className: isLandmark ? 'ttc-landmark-stop-marker' : 'ttc-clean-stop-marker',
