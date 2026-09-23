@@ -1059,7 +1059,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         )}
 
         {/* Floating Navigation & Zoom Controls (Bottom-Right) */}
-        <div className="absolute right-3 z-[500] flex flex-col items-center gap-2 ${selectedVehicle || selectedStop ? 'bottom-[14.5rem] sm:bottom-4' : 'bottom-4'}">
+        <div className={`absolute right-3 z-[500] flex flex-col items-center gap-2 ${selectedVehicle || selectedStop ? 'bottom-[14.5rem] sm:bottom-4' : 'bottom-4'}`}>
           {/* Zoom Buttons Group */}
           <div className="flex flex-col items-center bg-white/85 dark:bg-slate-900/85 p-1 rounded-2xl border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl">
             <button
