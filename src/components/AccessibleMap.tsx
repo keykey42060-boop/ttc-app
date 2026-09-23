@@ -321,10 +321,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           <div style="position: absolute; top: 5px; left: 3px; right: 3px; height: 10px; border-radius: 3px 3px 2px 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
           <div style="position: absolute; top: 18px; left: 3px; right: 3px; height: 10px; border-radius: 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
           <!-- Wheels -->
-          <div style="position: absolute; left: -4px; top: 9px; width: 5px; height: 10px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; right: -4px; top: 9px; width: 5px; height: 10px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; left: -4px; bottom: 9px; width: 5px; height: 10px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
-          <div style="position: absolute; right: -4px; bottom: 9px; width: 5px; height: 10px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; left: 1px; top: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
+          <div style="position: absolute; right: 1px; top: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
+          <div style="position: absolute; left: 1px; bottom: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
+          <div style="position: absolute; right: 1px; bottom: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
           
           <!-- Directional Heading Pointer (Street-Aligned) -->
           <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transform: rotate(${Math.round(heading)}deg);">
