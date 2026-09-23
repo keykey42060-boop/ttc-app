@@ -22,6 +22,19 @@ export interface RealTTCVehicle {
   lastUpdated: string;
   isClosest: boolean;
   towardStop: boolean;
+  isApproachingStop: boolean;
+}
+
+// Check whether the vehicle's reported compass heading points generally toward its stop.
+function isHeadingTowardPoint(lat: number, lng: number, targetLat: number, targetLng: number, heading: number): boolean {
+  const lat1 = (lat * Math.PI) / 180;
+  const lat2 = (targetLat * Math.PI) / 180;
+  const deltaLng = ((targetLng - lng) * Math.PI) / 180;
+  const y = Math.sin(deltaLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+  const bearingToStop = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  const headingDifference = Math.abs((heading - bearingToStop + 540) % 360 - 180);
+  return headingDifference <= 90;
 }
 
 // Haversine distance formula in meters
@@ -111,11 +124,12 @@ export async function fetchLiveTTCVehicles(
         lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
         isClosest: false,
         towardStop: direction === expectedBusDir,
+        isApproachingStop,
       }];
     });
 
     parsed.sort((a, b) => Number(b.towardStop) - Number(a.towardStop) || a.distanceMeters - b.distanceMeters);
-    const closestApproaching = parsed.find((vehicle) => vehicle.towardStop);
+    const closestApproaching = parsed.find((vehicle) => vehicle.towardStop && vehicle.isApproachingStop);
     if (closestApproaching) closestApproaching.isClosest = true;
     return parsed;
   } catch {
