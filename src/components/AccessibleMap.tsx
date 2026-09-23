@@ -632,7 +632,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, !v.towardStop ? v.direction : v.isApproachingStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -874,7 +874,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             >
               <span className={`w-2 h-2 rounded-full ${isWorkBus ? 'bg-blue-500' : 'bg-orange-500'}`} />
               <span>#{v.cleanVid}</span>
-              <span className="font-extrabold text-[11px] opacity-90">{v.towardStop ? `(${v.minutesToMomStop}m)` : `(${v.direction})`}</span>
+              <span className="font-extrabold text-[11px] opacity-90">{!v.towardStop ? `(${v.direction})` : v.isApproachingStop ? `(${v.minutesToMomStop}m)` : '(Away)'}</span>
             </button>
           );
         })}
@@ -988,10 +988,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
               <div className="text-right">
                 <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">
-                  {selectedVehicle.towardStop ? `${selectedVehicle.minutesToMomStop} MIN` : 'AWAY'}
+                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? `${selectedVehicle.minutesToMomStop} MIN` : 'AWAY'}
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                  {selectedVehicle.towardStop ? selectedVehicle.arrivalClockTime : 'Not heading to your stop'}
+                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? selectedVehicle.arrivalClockTime : 'Not approaching your stop'}
                 </div>
               </div>
             </div>
