@@ -117,7 +117,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const getMainLandmark = (stopCode: string): string | null => {
     if (stopCode === '6375') return '📍 Lower Jarvis';
     if (stopCode === '11169') return '🏪 St. Lawrence Market';
-    if (stopCode === '16754' || stopCode === '246') return '🚉 Union Station';
+    // Keep one Union Station label; the second nearby stop stays a regular stop marker.
+    if (stopCode === '16754') return '🚉 Union Station';
     return null;
   };
 
@@ -353,32 +354,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     `;
   };
 
-  // Realistic Landmark & Street Stop Sign
-  const createStopIcon = (stop: TTCStopInfo, landmarkText: string | null) => {
-    if (landmarkText) {
-      const isMarket = landmarkText.includes('Market');
-      const badgeBg = isMarket
-        ? 'background: #991B1B; color: #FEF2F2; border: 1.5px solid #F87171;'
-        : 'background: #1E3A8A; color: #EFF6FF; border: 1.5px solid #60A5FA;';
-
-      return `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; cursor: pointer;">
-          <!-- Realistic Landmark Capsule -->
-          <div style="padding: 3.5px 10px; border-radius: 9999px; font-size: 10.5px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; ${badgeBg} box-shadow: 0 4px 14px rgba(0,0,0,0.25); margin-bottom: 3px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
-            ${landmarkText}
-          </div>
-          <!-- Clean transit roundel -->
-          <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #FFFFFF; border: 3px solid #DC2626; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
-            <div style="width: 4px; height: 4px; border-radius: 50%; background-color: #DC2626;"></div>
-          </div>
-        </div>
-      `;
-    }
-
-    return `
-      <div style="width: 10px; height: 10px; border-radius: 50%; background-color: #FFFFFF; border: 2.5px solid #DC2626; box-shadow: 0 1px 3px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; cursor: pointer;"></div>
-    `;
-  };
+  // Stop locations use a small centered roundel. Landmark names are rendered as
+  // permanent Leaflet tooltips so the text can sit clear of the stop dot and road.
+  const createStopIcon = (_stop: TTCStopInfo, _landmarkText: string | null) => `
+    <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #FFFFFF; border: 3px solid #DC2626; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+      <div style="width: 4px; height: 4px; border-radius: 50%; background-color: #DC2626;"></div>
+    </div>
+  `;
 
   // Realistic Mom's Stop Beacon
   const createMomStopIcon = (stopCode: string, isSelected: boolean) => {
@@ -558,16 +540,21 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         icon: L.divIcon({
           html: createStopIcon(stop, landmark),
           className: isLandmark ? 'ttc-landmark-stop-marker' : 'ttc-clean-stop-marker',
-          iconSize: isLandmark ? [130, 36] : [10, 10],
-          iconAnchor: isLandmark ? [65, 30] : [5, 5],
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
         }),
         zIndexOffset: isLandmark ? 600 : 350,
       }).addTo(map);
 
-      stopMarker.bindTooltip(`<strong>${stop.name}</strong><br><span style="font-size:10px;color:#8E8E93">TTC Stop #${stop.code}</span>`, {
+      const tooltipText = isLandmark
+        ? `<strong>${landmark}</strong>`
+        : `<strong>${stop.name}</strong><br><span style="font-size:10px;color:#8E8E93">TTC Stop #${stop.code}</span>`;
+      stopMarker.bindTooltip(tooltipText, {
         direction: 'top',
-        offset: [0, -5],
-        className: 'compact-stop-tooltip',
+        offset: [0, isLandmark ? -16 : -5],
+        permanent: isLandmark,
+        opacity: 1,
+        className: isLandmark ? 'compact-stop-tooltip landmark-stop-tooltip' : 'compact-stop-tooltip',
       });
 
       stopMarker.on('click', () => {
