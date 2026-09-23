@@ -268,9 +268,9 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             // Update rotation of direction pointer directly via DOM transform for silky 60fps performance
             const iconElem = marker.getElement();
             if (iconElem) {
-              const needle = iconElem.querySelector('.realistic-bus-heading-needle') as HTMLElement;
-              if (needle) {
-                needle.style.transform = `rotate(${Math.round(state.currentHeading)}deg)`;
+              const busBody = iconElem.querySelector('.realistic-bus-body') as HTMLElement;
+              if (busBody) {
+                busBody.style.transform = `rotate(${state.currentHeading}deg)`;
               }
             }
           }
@@ -316,7 +316,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         </div>
 
         <!-- Realistic red bus body -->
-        <div style="position: relative; width: 22px; height: 44px; border-radius: 6px 6px 4px 4px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
+        <div class="realistic-bus-body" style="position: relative; width: 22px; height: 44px; border-radius: 6px 6px 4px 4px; display: flex; align-items: center; justify-content: center; transform: rotate(${Math.round(heading)}deg); transform-origin: center center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
           <!-- Front windshield and roof windows -->
           <div style="position: absolute; top: 5px; left: 3px; right: 3px; height: 10px; border-radius: 3px 3px 2px 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
           <div style="position: absolute; top: 18px; left: 3px; right: 3px; height: 10px; border-radius: 2px; background: #111827; border: 1px solid rgba(255,255,255,0.6);"></div>
@@ -327,7 +327,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           <div style="position: absolute; right: 1px; bottom: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
           
           <!-- Directional Heading Pointer (Street-Aligned) -->
-          <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transform: rotate(${Math.round(heading)}deg);">
+          <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
             <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -9px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
           </div>
 
