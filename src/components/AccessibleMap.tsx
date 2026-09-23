@@ -614,7 +614,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop && v.isApproachingStop ? `${v.minutesToMomStop}m` : '', effectiveHeading, v.direction, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop && v.isApproachingStop ? (v.minutesToMomStop === 0 ? 'Here' : `${v.minutesToMomStop}m`) : '', effectiveHeading, v.direction, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -969,7 +969,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
               <div className="text-right">
                 <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">
-                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? `${selectedVehicle.minutesToMomStop} MIN` : ''}
+                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? (selectedVehicle.minutesToMomStop === 0 ? 'HERE' : `${selectedVehicle.minutesToMomStop} MIN`) : ''}
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                   {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? selectedVehicle.arrivalClockTime : ''}
