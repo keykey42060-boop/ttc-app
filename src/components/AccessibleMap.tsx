@@ -329,7 +329,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   // ==============================================================
   const createRealisticVehicleIcon = (
     cleanVid: string,
-    minutes: number,
+    etaLabel: string,
     heading: number,
     isPrimary: boolean,
     isSelected: boolean
@@ -347,7 +347,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         
         <!-- Floating Realistic ETA Badge -->
         <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
-          ${minutes}m
+          ${etaLabel}
         </div>
 
         <!-- Top-down bus body, aligned to the vehicle's reported heading -->
@@ -626,7 +626,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, v.minutesToMomStop, effectiveHeading, isPrimary, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, isPrimary, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -863,7 +863,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             >
               <span className={`w-2 h-2 rounded-full ${isPrimary ? 'bg-red-500 animate-pulse' : 'bg-blue-500'}`} />
               <span>#{v.cleanVid}</span>
-              <span className="font-extrabold text-[11px] opacity-90">({v.minutesToMomStop}m)</span>
+              <span className="font-extrabold text-[11px] opacity-90">{v.towardStop ? `(${v.minutesToMomStop}m)` : `(${v.direction})`}</span>
             </button>
           );
         })}
@@ -973,10 +973,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
               <div className="text-right">
                 <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">
-                  {selectedVehicle.minutesToMomStop} MIN
+                  {selectedVehicle.towardStop ? `${selectedVehicle.minutesToMomStop} MIN` : 'AWAY'}
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                  {selectedVehicle.arrivalClockTime}
+                  {selectedVehicle.towardStop ? selectedVehicle.arrivalClockTime : 'Not heading to your stop'}
                 </div>
               </div>
             </div>
