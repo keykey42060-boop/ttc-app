@@ -49,6 +49,11 @@ interface VehicleAnimState {
   currentLng: number;
   targetLat: number;
   targetLng: number;
+  segmentStartLat: number;
+  segmentStartLng: number;
+  segmentStartTime: number;
+  segmentDurationMs: number;
+  lastPositionReceivedAt: number;
   currentHeading: number;
   targetHeading: number;
   speedKmH: number | null;
@@ -195,21 +200,41 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             currentLng: vehicle.lng,
             targetLat: vehicle.lat,
             targetLng: vehicle.lng,
+            segmentStartLat: vehicle.lat,
+            segmentStartLng: vehicle.lng,
+            segmentStartTime: now,
+            segmentDurationMs: 0,
+            lastPositionReceivedAt: now,
             currentHeading: vehicle.heading,
             targetHeading: vehicle.heading,
             speedKmH: vehicle.speedKmH,
             lastUpdate: sourceUpdatedAt,
           });
-        } else if (
-          sourceUpdatedAt > state.lastUpdate ||
-          Math.abs(state.targetLat - vehicle.lat) > 0.000001 ||
-          Math.abs(state.targetLng - vehicle.lng) > 0.000001
-        ) {
-          state.targetLat = vehicle.lat;
-          state.targetLng = vehicle.lng;
+        } else {
+          const positionChanged =
+            Math.abs(state.targetLat - vehicle.lat) > 0.0000001 ||
+            Math.abs(state.targetLng - vehicle.lng) > 0.0000001;
+
+          if (positionChanged) {
+            // TTC reports coordinates in bursts. Glide from the marker's current
+            // rendered point to the next GPS point across the report interval.
+            // This avoids easing to a stop after a fraction of a second, then jumping.
+            const sourceGapMs = sourceUpdatedAt > state.lastUpdate
+              ? sourceUpdatedAt - state.lastUpdate
+              : 0;
+            const observedGapMs = now - state.lastPositionReceivedAt;
+            state.segmentStartLat = state.currentLat;
+            state.segmentStartLng = state.currentLng;
+            state.segmentStartTime = now;
+            state.segmentDurationMs = Math.max(4500, Math.min(30000, Math.max(sourceGapMs, observedGapMs)));
+            state.targetLat = vehicle.lat;
+            state.targetLng = vehicle.lng;
+            state.lastPositionReceivedAt = now;
+            state.lastUpdate = sourceUpdatedAt;
+          }
+
           state.targetHeading = vehicle.heading;
           state.speedKmH = vehicle.speedKmH;
-          state.lastUpdate = sourceUpdatedAt;
         }
       });
       const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];
@@ -256,22 +281,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
       if (map && anims.size > 0) {
         anims.forEach((state, id) => {
-          // Smooth Lerp towards target coordinate (interpolates smoothly over frames)
-          const lerpFactor = Math.min(1.0, dt * 5.5);
-          state.currentLat += (state.targetLat - state.currentLat) * lerpFactor;
-          state.currentLng += (state.targetLng - state.currentLng) * lerpFactor;
-
-          // Dead reckoning: If close to target and moving, gently extrapolate along heading
-          const dLat = state.targetLat - state.currentLat;
-          const dLng = state.targetLng - state.currentLng;
-          const distSq = dLat * dLat + dLng * dLng;
-          if (distSq < 0.0000001 && state.speedKmH > 0 && Date.now() - state.lastUpdate < 15000) {
-            // ~22 km/h is ~6.1 meters per second
-            const metersMove = (state.speedKmH * 1000 / 3600) * dt;
-            const headingRad = (state.currentHeading * Math.PI) / 180;
-            state.currentLat += (metersMove * Math.cos(headingRad)) / 111100;
-            state.currentLng += (metersMove * Math.sin(headingRad)) / 80600;
-          }
+          // Move at a steady pace between GPS reports. Each new report starts
+          // from the current rendered position, so corrections stay continuous.
+          const segmentProgress = state.segmentDurationMs > 0
+            ? Math.min(1, Math.max(0, (time - state.segmentStartTime) / state.segmentDurationMs))
+            : 1;
+          state.currentLat = state.segmentStartLat + (state.targetLat - state.segmentStartLat) * segmentProgress;
+          state.currentLng = state.segmentStartLng + (state.targetLng - state.segmentStartLng) * segmentProgress;
 
           // Shortest-arc heading angle interpolation (no 360 degree snap spinning)
           let deltaH = (state.targetHeading - state.currentHeading + 540) % 360 - 180;
