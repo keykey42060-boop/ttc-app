@@ -207,7 +207,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           state.lastUpdate = sourceUpdatedAt;
         }
       });
-      const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];\n      setLastFeedSync(newestUpdate ? `TTC updated ${Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000))}s ago` : 'Waiting for TTC vehicles');
+      const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];
+      setLastFeedSync(newestUpdate ? `TTC updated ${Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000))}s ago` : 'Waiting for TTC vehicles');
     } catch (err) {
       console.error('Fast feed refresh error:', err);
     }
