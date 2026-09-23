@@ -1,7 +1,34 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import {Component, StrictMode, createRoot, type ErrorInfo, type ReactNode} from 'react';
 import App from './App.tsx';
 import './index.css';
+
+type ErrorBoundaryState = {error: Error | null};
+
+class AppErrorBoundary extends Component<{children: ReactNode}, ErrorBoundaryState> {
+  state: ErrorBoundaryState = {error: null};
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return {error};
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('ClearRide render failed:', error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <main role="alert" style={{fontFamily: 'system-ui, sans-serif', padding: 32, color: '#111827'}}>
+          <h1>ClearRide couldn't load</h1>
+          <p>{this.state.error.message}</p>
+          <p>Refresh the page to try again.</p>
+        </main>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
@@ -12,7 +39,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <AppErrorBoundary>
+    <StrictMode>
+      <App />
+    </StrictMode>
+  </AppErrorBoundary>,
 );
