@@ -331,12 +331,12 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     cleanVid: string,
     etaLabel: string,
     heading: number,
-    isPrimary: boolean,
+    direction: 'East' | 'West',
     isSelected: boolean
   ) => {
-    const bgGradient = isPrimary
-      ? 'background: linear-gradient(145deg, #E61E14 0%, #BA0C02 100%);'
-      : 'background: linear-gradient(145deg, #1D6AE5 0%, #0F4BB8 100%);';
+    const bgGradient = direction === 'East'
+      ? 'background: linear-gradient(145deg, #3B82F6 0%, #1D4ED8 100%);'
+      : 'background: linear-gradient(145deg, #FB923C 0%, #C2410C 100%);';
 
     const glowShadow = isSelected
       ? 'box-shadow: 0 0 0 3px #FACC15, 0 8px 20px rgba(0,0,0,0.45);'
@@ -440,7 +440,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
     // Realistic vibrant transit route ribbon
     const linePrimary = L.polyline(primaryPolyline, {
-      color: '#FF3B30',
+      color: isGoingToWork ? '#2563EB' : '#EA580C',
       weight: 4.5,
       opacity: 0.95,
       lineCap: 'round',
@@ -449,7 +449,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
     // Secondary route ribbon (soft translucent)
     const lineSecondary = L.polyline(secondaryPolyline, {
-      color: '#FF3B30',
+      color: '#94A3B8',
       weight: 2.8,
       opacity: 0.45,
       lineCap: 'round',
@@ -529,8 +529,14 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     const secondaryPolyline = !isGoingToWork ? ROUTE_121_EASTBOUND_POLYLINE : ROUTE_121_WESTBOUND_POLYLINE;
 
     if (casingPrimaryRef.current) casingPrimaryRef.current.setLatLngs(primaryPolyline);
-    if (linePrimaryRef.current) linePrimaryRef.current.setLatLngs(primaryPolyline);
-    if (lineSecondaryRef.current) lineSecondaryRef.current.setLatLngs(secondaryPolyline);
+    if (linePrimaryRef.current) {
+      linePrimaryRef.current.setLatLngs(primaryPolyline);
+      linePrimaryRef.current.setStyle({ color: isGoingToWork ? '#2563EB' : '#EA580C' });
+    }
+    if (lineSecondaryRef.current) {
+      lineSecondaryRef.current.setLatLngs(secondaryPolyline);
+      lineSecondaryRef.current.setStyle({ color: '#94A3B8' });
+    }
 
     if (momStopMarkerRef.current) {
       momStopMarkerRef.current.setLatLng([activeMomStop.lat, activeMomStop.lng]);
@@ -626,7 +632,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, isPrimary, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -768,10 +774,14 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onToggleCommute && (
             <button
               onClick={() => onToggleCommute(isGoingToWork ? 'to_home' : 'to_work')}
-              className="px-2 sm:px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 transition-all shadow-xs border border-black/5 dark:border-white/10 shrink-0"
+              className={`px-2 sm:px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs shrink-0 border ${
+                isGoingToWork
+                  ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/50 dark:hover:bg-blue-900/60 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800'
+                  : 'bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/50 dark:hover:bg-orange-900/60 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-800'
+              }`}
               title="Switch Morning Work / Afternoon Home"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <ArrowLeftRight className={`w-3.5 h-3.5 shrink-0 ${isGoingToWork ? 'text-blue-600' : 'text-orange-600'}`} />
               <span className="hidden sm:inline">{isGoingToWork ? 'Going Home' : 'Going to Work'}</span>
               <span className="sm:hidden">{isGoingToWork ? 'Home' : 'Work'}</span>
               <span className="hidden lg:inline text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold">
@@ -847,21 +857,22 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         {/* Individual Bus Chips */}
         {liveVehicles.map((v, i) => {
           const isSelected = selectedVehicleId === v.id;
-          const isPrimary = i === 0;
+          const isWorkBus = v.direction === 'East';
+          const busColorClass = isWorkBus
+            ? isSelected
+              ? 'bg-blue-600 text-white ring-2 ring-blue-300/70 shadow-md'
+              : 'bg-blue-500/10 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 hover:bg-blue-500/20 border border-blue-500/30'
+            : isSelected
+              ? 'bg-orange-600 text-white ring-2 ring-orange-300/70 shadow-md'
+              : 'bg-orange-500/10 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300 hover:bg-orange-500/20 border border-orange-500/30';
 
           return (
             <button
               key={v.id}
               onClick={() => focusVehicle(v)}
-              className={`min-h-10 px-3 py-2 rounded-full font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-2xs ${
-                isSelected
-                  ? 'bg-blue-600 text-white ring-2 ring-blue-400/50 shadow-md'
-                  : isPrimary
-                  ? 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400 hover:bg-red-500/20 border border-red-500/30'
-                  : 'bg-white/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-700 border border-black/5 dark:border-white/10'
-              }`}
+              className={`min-h-10 px-3 py-2 rounded-full font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-2xs ${busColorClass}`}
             >
-              <span className={`w-2 h-2 rounded-full ${isPrimary ? 'bg-red-500 animate-pulse' : 'bg-blue-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${isWorkBus ? 'bg-blue-500' : 'bg-orange-500'}`} />
               <span>#{v.cleanVid}</span>
               <span className="font-extrabold text-[11px] opacity-90">{v.towardStop ? `(${v.minutesToMomStop}m)` : `(${v.direction})`}</span>
             </button>
@@ -935,9 +946,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         </div>
 
         {/* Live Status & Commute Pill (Top-Left) */}
-        <div className="absolute top-3 left-3 z-[500] px-3 py-1.5 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl flex items-center gap-2 text-xs">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="font-extrabold text-slate-900 dark:text-white">
+        <div className={`absolute top-3 left-3 z-[500] px-3 py-1.5 rounded-2xl shadow-xl backdrop-blur-xl flex items-center gap-2 text-xs border ${
+          isGoingToWork
+            ? 'bg-blue-50/95 dark:bg-blue-950/90 border-blue-200 dark:border-blue-800'
+            : 'bg-orange-50/95 dark:bg-orange-950/90 border-orange-200 dark:border-orange-800'
+        }`}>
+          <span className={`w-2.5 h-2.5 rounded-full animate-pulse ${isGoingToWork ? 'bg-blue-500' : 'bg-orange-500'}`}></span>
+          <span className={`font-extrabold ${isGoingToWork ? 'text-blue-900 dark:text-blue-100' : 'text-orange-900 dark:text-orange-100'}`}>
             {isGoingToWork ? 'TO WORK' : 'TO HOME'}
           </span>
           <span className="text-slate-500 dark:text-slate-400 text-[10px] font-medium hidden sm:inline">
