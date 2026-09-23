@@ -998,7 +998,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
                   <Compass className="w-3 h-3 text-blue-500" /> Heading
                 </div>
-                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">Heading your way ({selectedVehicle.heading}°)</div>
+                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">Your way ({selectedVehicle.heading}°)</div>
               </div>
               <div className="bg-slate-100/70 dark:bg-slate-800/60 p-2 rounded-xl">
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Seats</div>
