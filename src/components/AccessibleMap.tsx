@@ -327,8 +327,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           <div style="position: absolute; right: 1px; bottom: 9px; width: 3px; height: 10px; border-radius: 1px; background: #20242A;"></div>
           
           <!-- Directional Heading Pointer (Street-Aligned) -->
-          <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -9px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
+          <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 3;">
+            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #FACC15; position: absolute; top: -11px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
           </div>
 
           <!-- Bus Number on the side panel -->
