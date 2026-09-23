@@ -89,266 +89,78 @@ export async function fetchLiveTTCVehicles(
   const isGoingHome = travelDirection === 'to_home' || getDistanceMeters(momStopLat, momStopLng, MOM_HOME_STOP.lat, MOM_HOME_STOP.lng) < 100;
   const expectedBusDir: 'West' | 'East' = isGoingHome ? 'West' : 'East';
 
-  // 1. Primary: Official TTC BusTime REST API with fast 1.2s timeout
+  // BusTime requires a developer key, which is kept server-side in the Pages Function.
+  // Never substitute fabricated vehicle locations when the live feed is unavailable.
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const response = await fetch(`/api/ttc/vehicles?rt=${encodeURIComponent(routeNum)}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    if (!response.ok) return [];
 
-    // Attempt open public TTC vehicle feed if available, otherwise instant high-precision 60fps tracking
-    const response = await fetch(
-      `https://bustime.ttc.ca/api/v3/getvehicles?rt=${routeNum}&format=json`,
-      { cache: 'no-store', signal: controller.signal }
-    );
-    clearTimeout(timeoutId);
+    const data = await response.json();
+    const rawVehicles = data?.['bustime-response']?.vehicle || [];
+    if (!Array.isArray(rawVehicles)) return [];
 
-    if (response.ok) {
-      const data = await response.json();
-      const rawVehicles = data?.['bustime-response']?.vehicle || [];
+    const now = new Date();
+    const parsed: RealTTCVehicle[] = rawVehicles.flatMap((v: any) => {
+      const lat = Number(v.lat);
+      const lng = Number(v.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return [];
 
-      if (Array.isArray(rawVehicles) && rawVehicles.length > 0) {
-        const now = new Date();
+      const heading = Number(v.hdg) || 0;
+      const distM = getDistanceMeters(lat, lng, momStopLat, momStopLng);
+      const estimatedMinutes = Math.max(1, Math.round(distM / 250));
+      const arrivalClock = new Date(now.getTime() + estimatedMinutes * 60000)
+        .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const loadMap: Record<string, string> = {
+        EMPTY: 'Plenty of Seats',
+        HALF_EMPTY: 'Plenty of Seats',
+        HALF_FULL: 'Seats Available',
+        FULL: 'Crowded',
+      };
 
-        const parsed: RealTTCVehicle[] = rawVehicles.map((v: any) => {
-          const lat = parseFloat(v.lat);
-          const lng = parseFloat(v.lon);
-          const heading = parseInt(v.hdg, 10) || 0;
-          const distM = getDistanceMeters(lat, lng, momStopLat, momStopLng);
-          const estimatedMinutes = Math.max(1, Math.round(distM / 250));
-          const arrivalDate = new Date(now.getTime() + estimatedMinutes * 60000);
-          const arrivalClock = arrivalDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const rawDir = String(v.rtdir || '').toLowerCase();
+      const direction: 'East' | 'West' = rawDir.includes('west')
+        ? 'West'
+        : rawDir.includes('east')
+          ? 'East'
+          : (heading > 180 && heading < 360 ? 'West' : 'East');
+      const vidStr = String(v.vid || '').replace(/\\D/g, '');
+      if (!vidStr) return [];
 
-          const loadMap: Record<string, string> = {
-            EMPTY: 'Plenty of Seats',
-            HALF_EMPTY: 'Plenty of Seats',
-            HALF_FULL: 'Seats Available',
-            FULL: 'Crowded',
-          };
+      return [{
+        id: `ttc-${vidStr}`,
+        vehicleNumber: `#${vidStr}`,
+        cleanVid: vidStr,
+        route: String(v.rt || routeNum),
+        lat,
+        lng,
+        heading,
+        speedKmH: Math.round((Number(v.spd) || 0) * 1.60934),
+        direction,
+        destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint Hospital' : 'Towards Union Station'),
+        passengerLoad: loadMap[v.psgld] || 'Seats Available',
+        minutesToMomStop: estimatedMinutes,
+        distanceMeters: distM,
+        arrivalClockTime: arrivalClock,
+        lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
+        isClosest: false,
+      }];
+    });
 
-          const rawDir = (v.rtdir || '').toLowerCase();
-          const direction: 'East' | 'West' = rawDir.includes('west') ? 'West' : rawDir.includes('east') ? 'East' : (heading > 150 && heading < 330) ? 'West' : 'East';
-          const vidStr = String(v.vid || '').replace(/\D/g, '');
-
-          return {
-            id: `ttc-${vidStr}`,
-            vehicleNumber: `#${vidStr}`,
-            cleanVid: vidStr,
-            route: v.rt || routeNum,
-            lat,
-            lng,
-            heading,
-            speedKmH: Math.round(parseFloat(v.spd) * 1.60934) || 0,
-            direction,
-            destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint' : 'Towards Union Station'),
-            passengerLoad: loadMap[v.psgld] || 'Seats Available',
-            minutesToMomStop: estimatedMinutes,
-            distanceMeters: distM,
-            arrivalClockTime: arrivalClock,
-            lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-            isClosest: false,
-          };
-        });
-
-        parsed.sort((a, b) => {
-          const aMatches = a.direction === expectedBusDir ? 0 : 1;
-          const bMatches = b.direction === expectedBusDir ? 0 : 1;
-          if (aMatches !== bMatches) return aMatches - bMatches;
-          return a.minutesToMomStop - b.minutesToMomStop;
-        });
-
-        if (parsed.length > 0) {
-          parsed[0].isClosest = true;
-        }
-
-        return parsed;
-      }
-    }
+    const matchingDirection = parsed.filter(vehicle => vehicle.direction === expectedBusDir);
+    matchingDirection.sort((a, b) => a.distanceMeters - b.distanceMeters);
+    if (matchingDirection.length) matchingDirection[0].isClosest = true;
+    return matchingDirection;
   } catch {
-    // Graceful fallback to continuous motion simulation
+    return [];
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  // 2. Continuous real-time street motion along official GTFS centerline
-  return generateContinuous121Vehicles(momStopLat, momStopLng, isGoingHome);
 }
 
-/**
- * Generates continuous, buttery-smooth real-time vehicle positions along Route 121
- * Based on authentic real-world speeds (22-26 km/h) and continuous elapsed time
- */
-function generateContinuous121Vehicles(
-  momStopLat: number,
-  momStopLng: number,
-  isGoingHome: boolean
-): RealTTCVehicle[] {
-  const now = new Date();
-  const timeSeconds = Date.now() / 1000;
-
-  if (isGoingHome) {
-    // ==============================================================
-    // COMING HOME (WESTBOUND towards Union Station via Stop #15583)
-    // Mom is at Stop #15583 (The Esplanade at Church West Side)
-    // Full corridor duration is approx 14 minutes (840s)
-    // ==============================================================
-    const wb = ROUTE_121_WESTBOUND_POLYLINE;
-    const loopDuration = 840; // 14 mins
-
-    // Bus 1: Closest Westbound bus - gliding along The Esplanade near Jarvis & Market towards Church
-    // Base progress ~0.84 to 0.94 (right before Mom's stop at ~0.94)
-    const t1 = (timeSeconds % loopDuration) / loopDuration;
-    const prog1 = 0.82 + (t1 * 0.12) % 0.12; 
-    const pos1 = interpolatePolyline(wb, prog1);
-    const dist1 = getDistanceMeters(pos1.lat, pos1.lng, momStopLat, momStopLng);
-    const min1 = Math.max(1, Math.round(dist1 / 250));
-
-    // Bus 2: Mid-distance Westbound bus - along Mill St / Distillery District
-    const prog2 = 0.58 + ((t1 + 0.33) * 0.14) % 0.14;
-    const pos2 = interpolatePolyline(wb, prog2);
-    const dist2 = getDistanceMeters(pos2.lat, pos2.lng, momStopLat, momStopLng);
-    const min2 = Math.max(min1 + 3, Math.round(dist2 / 250));
-
-    // Bus 3: Incoming from River St & Bridgepoint
-    const prog3 = 0.22 + ((t1 + 0.66) * 0.18) % 0.18;
-    const pos3 = interpolatePolyline(wb, prog3);
-    const dist3 = getDistanceMeters(pos3.lat, pos3.lng, momStopLat, momStopLng);
-    const min3 = Math.max(min2 + 5, Math.round(dist3 / 250));
-
-    return [
-      {
-        id: 'ttc-8513',
-        vehicleNumber: '#8513',
-        cleanVid: '8513',
-        route: '121',
-        lat: pos1.lat,
-        lng: pos1.lng,
-        heading: pos1.heading,
-        speedKmH: 24,
-        direction: 'West',
-        destination: 'Towards Union Station',
-        passengerLoad: 'Seats Available',
-        minutesToMomStop: min1,
-        distanceMeters: dist1,
-        arrivalClockTime: new Date(now.getTime() + min1 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: true,
-      },
-      {
-        id: 'ttc-8499',
-        vehicleNumber: '#8499',
-        cleanVid: '8499',
-        route: '121',
-        lat: pos2.lat,
-        lng: pos2.lng,
-        heading: pos2.heading,
-        speedKmH: 26,
-        direction: 'West',
-        destination: 'Towards Union Station',
-        passengerLoad: 'Plenty of Seats',
-        minutesToMomStop: min2,
-        distanceMeters: dist2,
-        arrivalClockTime: new Date(now.getTime() + min2 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: false,
-      },
-      {
-        id: 'ttc-8483',
-        vehicleNumber: '#8483',
-        cleanVid: '8483',
-        route: '121',
-        lat: pos3.lat,
-        lng: pos3.lng,
-        heading: pos3.heading,
-        speedKmH: 22,
-        direction: 'West',
-        destination: 'Towards Union Station',
-        passengerLoad: 'Plenty of Seats',
-        minutesToMomStop: min3,
-        distanceMeters: dist3,
-        arrivalClockTime: new Date(now.getTime() + min3 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: false,
-      },
-    ];
-  } else {
-    // ==============================================================
-    // GOING TO WORK (EASTBOUND towards Hennick Bridgepoint via Stop #16754)
-    // Mom is at Stop #16754 (Front St West at Union Station)
-    // ==============================================================
-    const eb = ROUTE_121_EASTBOUND_POLYLINE;
-    const loopDuration = 840;
-    const t1 = (timeSeconds % loopDuration) / loopDuration;
-
-    // Bus 1: Approaching Front St West near Union Station
-    const prog1 = 0.02 + (t1 * 0.10) % 0.10;
-    const pos1 = interpolatePolyline(eb, prog1);
-    const dist1 = getDistanceMeters(pos1.lat, pos1.lng, momStopLat, momStopLng);
-    const min1 = Math.max(1, Math.round(dist1 / 250));
-
-    // Bus 2: Further behind
-    const prog2 = 0.28 + ((t1 + 0.33) * 0.15) % 0.15;
-    const pos2 = interpolatePolyline(eb, prog2);
-    const dist2 = getDistanceMeters(pos2.lat, pos2.lng, momStopLat, momStopLng);
-    const min2 = Math.max(min1 + 4, Math.round(dist2 / 250));
-
-    // Bus 3: Near Parliament / River
-    const prog3 = 0.55 + ((t1 + 0.66) * 0.18) % 0.18;
-    const pos3 = interpolatePolyline(eb, prog3);
-    const dist3 = getDistanceMeters(pos3.lat, pos3.lng, momStopLat, momStopLng);
-    const min3 = Math.max(min2 + 6, Math.round(dist3 / 250));
-
-    return [
-      {
-        id: 'ttc-8499',
-        vehicleNumber: '#8499',
-        cleanVid: '8499',
-        route: '121',
-        lat: pos1.lat,
-        lng: pos1.lng,
-        heading: pos1.heading,
-        speedKmH: 22,
-        direction: 'East',
-        destination: 'Towards Hennick Bridgepoint Hospital',
-        passengerLoad: 'Plenty of Seats',
-        minutesToMomStop: min1,
-        distanceMeters: dist1,
-        arrivalClockTime: new Date(now.getTime() + min1 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: true,
-      },
-      {
-        id: 'ttc-8513',
-        vehicleNumber: '#8513',
-        cleanVid: '8513',
-        route: '121',
-        lat: pos2.lat,
-        lng: pos2.lng,
-        heading: pos2.heading,
-        speedKmH: 25,
-        direction: 'East',
-        destination: 'Towards Hennick Bridgepoint Hospital',
-        passengerLoad: 'Seats Available',
-        minutesToMomStop: min2,
-        distanceMeters: dist2,
-        arrivalClockTime: new Date(now.getTime() + min2 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: false,
-      },
-      {
-        id: 'ttc-8483',
-        vehicleNumber: '#8483',
-        cleanVid: '8483',
-        route: '121',
-        lat: pos3.lat,
-        lng: pos3.lng,
-        heading: pos3.heading,
-        speedKmH: 20,
-        direction: 'East',
-        destination: 'Towards Hennick Bridgepoint Hospital',
-        passengerLoad: 'Plenty of Seats',
-        minutesToMomStop: min3,
-        distanceMeters: dist3,
-        arrivalClockTime: new Date(now.getTime() + min3 * 60000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-        lastUpdated: now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
-        isClosest: false,
-      },
-    ];
-  }
 }
