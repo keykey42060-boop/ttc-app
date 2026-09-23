@@ -592,8 +592,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           icon: L.divIcon({
             html,
             className: 'realistic-bus-puck-marker',
-            iconSize: [46, 52],
-            iconAnchor: [23, 36],
+            iconSize: [46, 71],
+            iconAnchor: [23, 53],
           }),
           zIndexOffset: isPrimary ? 1200 : 1000 - index,
         }).addTo(map);
@@ -611,8 +611,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           L.divIcon({
             html,
             className: 'realistic-bus-puck-marker',
-            iconSize: [46, 52],
-            iconAnchor: [23, 36],
+            iconSize: [46, 71],
+            iconAnchor: [23, 53],
           })
         );
         marker.setZIndexOffset(isPrimary ? 1200 : 1000 - index);
