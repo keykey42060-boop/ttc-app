@@ -292,7 +292,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   }, [followBusId]);
 
   // ==============================================================
-  // REALISTIC 3D TRANSIT VEHICLE PUCK
+  // REALISTIC RED TRANSIT BUS MARKER
   // ==============================================================
   const createRealisticVehicleIcon = (
     cleanVid: string,
@@ -301,9 +301,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     isPrimary: boolean,
     isSelected: boolean
   ) => {
-    const bgGradient = isPrimary
-      ? 'background: linear-gradient(145deg, #E61E14 0%, #BA0C02 100%);'
-      : 'background: linear-gradient(145deg, #1D6AE5 0%, #0F4BB8 100%);';
+    const bgGradient = 'background: linear-gradient(145deg, #F04438 0%, #B91C1C 100%);';
 
     const glowShadow = isSelected
       ? 'box-shadow: 0 0 0 3px #FACC15, 0 8px 20px rgba(0,0,0,0.45);'
@@ -317,16 +315,24 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           ${minutes}m
         </div>
 
-        <!-- 32px Circular Realistic Bus Puck -->
-        <div style="position: relative; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
+        <!-- Realistic red bus body -->
+        <div style="position: relative; width: 27px; height: 37px; border-radius: 7px 7px 5px 5px; display: flex; align-items: center; justify-content: center; ${bgGradient} border: 2.5px solid #FFFFFF; ${glowShadow}">
+          <!-- Front windshield and roof windows -->
+          <div style="position: absolute; top: 4px; left: 4px; right: 4px; height: 7px; border-radius: 3px 3px 2px 2px; background: #17324D; border: 1px solid rgba(255,255,255,0.65);"></div>
+          <div style="position: absolute; top: 14px; left: 4px; right: 4px; height: 7px; border-radius: 2px; background: #2B5878; border: 1px solid rgba(255,255,255,0.45);"></div>
+          <!-- Wheels -->
+          <div style="position: absolute; left: -4px; top: 8px; width: 5px; height: 9px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; right: -4px; top: 8px; width: 5px; height: 9px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; left: -4px; bottom: 7px; width: 5px; height: 9px; border-radius: 2px 0 0 2px; background: #20242A; border: 1px solid #FFFFFF;"></div>
+          <div style="position: absolute; right: -4px; bottom: 7px; width: 5px; height: 9px; border-radius: 0 2px 2px 0; background: #20242A; border: 1px solid #FFFFFF;"></div>
           
           <!-- Directional Heading Pointer (Street-Aligned) -->
           <div class="realistic-bus-heading-needle" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transform: rotate(${Math.round(heading)}deg);">
-            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -7px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
+            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 8px solid #FACC15; position: absolute; top: -9px; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.5));"></div>
           </div>
 
-          <!-- Bus Number inside puck -->
-          <span style="font-size: 10.5px; font-weight: 900; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: white; line-height: 1; letter-spacing: -0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
+          <!-- Bus Number on the side panel -->
+          <span style="font-size: 7px; font-weight: 900; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: white; line-height: 1; letter-spacing: -0.2px; text-shadow: 0 1px 2px rgba(0,0,0,0.4);">
             ${cleanVid.length > 4 ? cleanVid.slice(-3) : cleanVid}
           </span>
         </div>
