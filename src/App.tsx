@@ -6,7 +6,7 @@ import { BigTextView } from './components/BigTextView';
 import { AccessibleMap } from './components/AccessibleMap';
 import { NotificationPrototypeModal } from './components/NotificationPrototypeModal';
 import { TestWithHerPanel } from './components/TestWithHerPanel';
-import { Volume2, Map as MapIcon, Sliders, Bell, Phone } from 'lucide-react';
+import { Volume2, Map as MapIcon, Sliders, Bell, Phone, MessageSquare } from 'lucide-react';
 
 const DEFAULT_SETTINGS: AccessibilitySettings = {
   textSize: 'xlarge',
@@ -272,6 +272,15 @@ export default function App() {
           <Bell className="w-5 h-5 stroke-[2.5]" />
           <span className="text-[10px] font-bold leading-none">Alerts</span>
         </button>
+
+        <a
+          href={`sms:898882?body=${encodeURIComponent(activeRoute.originStopId.replace(/\D/g, ''))}`}
+          aria-label={`Text TTC for stop ${activeRoute.originStopId.replace(/\D/g, '')}`}
+          className="flex flex-col items-center justify-center p-2 rounded-xl min-w-[60px] min-h-[52px] gap-1 transition-colors text-slate-500 dark:text-slate-400 active:text-sky-600"
+        >
+          <MessageSquare className="w-5 h-5 stroke-[2.5]" />
+          <span className="text-[10px] font-bold leading-none">Text</span>
+        </a>
 
         <button
           onClick={() => setShowTestPanel(true)}
