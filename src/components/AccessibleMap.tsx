@@ -484,7 +484,30 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     const bounds = L.latLngBounds(allCoords);
     map.fitBounds(bounds, { padding: [40, 40] });
 
+    // The map sits in a flex-sized workspace that can change after Leaflet mounts
+    // (mobile viewport bars, detail cards, and responsive layout). Recalculate its
+    // pixel bounds so tiles and overlays stay aligned instead of leaving blank seams.
+    const invalidateMapSize = () => {
+      if (!mapInstanceRef.current || mapInstanceRef.current !== map) return;
+      map.invalidateSize({ pan: false, debounceMoveend: true });
+    };
+    const resizeObserver = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(invalidateMapSize)
+      : null;
+    if (resizeObserver && mapContainerRef.current) {
+      resizeObserver.observe(mapContainerRef.current);
+    }
+    window.addEventListener('resize', invalidateMapSize);
+    document.addEventListener('visibilitychange', invalidateMapSize);
+    const firstFrame = requestAnimationFrame(invalidateMapSize);
+    const settledFrame = window.setTimeout(invalidateMapSize, 180);
+
     return () => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener('resize', invalidateMapSize);
+      document.removeEventListener('visibilitychange', invalidateMapSize);
+      cancelAnimationFrame(firstFrame);
+      window.clearTimeout(settledFrame);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
