@@ -333,30 +333,21 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       ? 'box-shadow: 0 0 0 3px #FACC15, 0 8px 20px rgba(0,0,0,0.45);'
       : 'box-shadow: 0 4px 12px rgba(0,0,0,0.32), 0 1px 3px rgba(0,0,0,0.25);';
 
-    return `
-      <div style="position: relative; width: 46px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
-        
-        <!-- Floating Realistic ETA Badge -->
-        <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
-          ${etaLabel}
-        </div>
+    const etaBadge = etaLabel ? `<div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">${etaLabel}</div>` : '';
 
-        <!-- Top-down bus body, aligned to the vehicle's reported heading -->
-        <div class="realistic-bus-heading-needle" style="position: relative; width: 25px; height: 38px; border-radius: 7px 7px 5px 5px; ${bgGradient} border: 2px solid #FFFFFF; ${glowShadow} transform: rotate(${Math.round(heading)}deg); display: flex; flex-direction: column; align-items: center; padding-top: 3px; box-sizing: border-box;">
-          <!-- Front windshield and destination panel -->
-          <div style="width: 13px; height: 6px; border-radius: 3px 3px 1px 1px; background: #CFFAFE; border: 1px solid rgba(255,255,255,.85);"></div>
-          <div style="width: 15px; height: 2px; background: #FACC15; margin-top: 2px; border-radius: 2px;"></div>
-          <!-- Side windows -->
-          <div style="width: 15px; height: 8px; margin-top: 3px; border-radius: 2px; background: #DBEAFE; border: 1px solid rgba(255,255,255,.8);"></div>
-          <!-- Rear window -->
-          <div style="width: 11px; height: 4px; margin-top: 2px; border-radius: 1px 1px 3px 3px; background: #BFDBFE;"></div>
-          <!-- Wheels -->
-          <span style="position:absolute; left:-3px; top:9px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 12px 0 #111827;"></span>
-          <span style="position:absolute; right:-3px; top:9px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 12px 0 #111827;"></span>
+    return `
+      <div style="position: relative; width: 42px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; pointer-events: auto;">
+        ${etaBadge}
+        <div class="realistic-bus-heading-needle" style="position: relative; width: 20px; height: 34px; border-radius: 6px 6px 5px 5px; ${bgGradient} border: 2px solid #FFFFFF; ${glowShadow} transform: rotate(${Math.round(heading)}deg); display: flex; flex-direction: column; align-items: center; padding-top: 4px; box-sizing: border-box;">
+          <svg aria-hidden="true" viewBox="0 0 12 12" style="position:absolute; width:10px; height:10px; left:50%; top:-8px; transform:translateX(-50%); filter:drop-shadow(0 1px 1px rgba(0,0,0,.65));"><path d="M6 0 L12 11 L6 8 L0 11 Z" fill="#FACC15" stroke="#111827" stroke-width="1" stroke-linejoin="round"/></svg>
+          <div style="width: 12px; height: 6px; border-radius: 3px 3px 1px 1px; background: #CFFAFE; border: 1px solid rgba(255,255,255,.9);"></div>
+          <div style="width: 13px; height: 2px; background: #FACC15; margin-top: 2px; border-radius: 2px;"></div>
+          <div style="width: 12px; height: 7px; margin-top: 3px; border-radius: 2px; background: #DBEAFE; border: 1px solid rgba(255,255,255,.8);"></div>
+          <div style="width: 10px; height: 3px; margin-top: 2px; border-radius: 1px 1px 3px 3px; background: #BFDBFE;"></div>
+          <span style="position:absolute; left:-3px; top:10px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 10px 0 #111827;"></span>
+          <span style="position:absolute; right:-3px; top:10px; width:3px; height:6px; border-radius:2px; background:#111827; box-shadow: 0 10px 0 #111827;"></span>
         </div>
-        <span style="margin-top:1px; font-size:8px; line-height:9px; font-weight:900; font-family:system-ui,sans-serif; color:#FFFFFF; text-shadow:0 1px 3px #111827; white-space:nowrap;">
-          ${cleanVid}
-        </span>
+        <span style="margin-top:1px; font-size:8px; line-height:9px; font-weight:900; font-family:system-ui,sans-serif; color:#FFFFFF; text-shadow:0 1px 3px #111827; white-space:nowrap;">${cleanVid}</span>
       </div>
     `;
   };
@@ -623,7 +614,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, !v.towardStop ? 'Heading your way' : v.isApproachingStop ? `${v.minutesToMomStop}m` : 'Away', effectiveHeading, v.direction, isSelected);
+      const html = createRealisticVehicleIcon(v.cleanVid, v.towardStop && v.isApproachingStop ? `${v.minutesToMomStop}m` : '', effectiveHeading, v.direction, isSelected);
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -631,8 +622,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           icon: L.divIcon({
             html,
             className: 'realistic-bus-puck-marker',
-            iconSize: [46, 64],
-            iconAnchor: [23, 33],
+            iconSize: [42, 56],
+            iconAnchor: [21, 30],
           }),
           zIndexOffset: isPrimary ? 1200 : 1000 - index,
         }).addTo(map);
@@ -650,8 +641,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           L.divIcon({
             html,
             className: 'realistic-bus-puck-marker',
-            iconSize: [46, 52],
-            iconAnchor: [23, 36],
+            iconSize: [42, 56],
+            iconAnchor: [21, 30],
           })
         );
         marker.setZIndexOffset(isPrimary ? 1200 : 1000 - index);
@@ -865,7 +856,6 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             >
               <span className={`w-2 h-2 rounded-full ${isWorkBus ? 'bg-blue-500' : 'bg-orange-500'}`} />
               <span>#{v.cleanVid}</span>
-              <span className="font-extrabold text-[11px] opacity-90">{!v.towardStop ? '(Heading your way)' : v.isApproachingStop ? `(${v.minutesToMomStop}m)` : '(Away)'}</span>
             </button>
           );
         })}
@@ -979,10 +969,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
               <div className="text-right">
                 <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">
-                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? `${selectedVehicle.minutesToMomStop} MIN` : 'AWAY'}
+                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? `${selectedVehicle.minutesToMomStop} MIN` : ''}
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? selectedVehicle.arrivalClockTime : 'Not approaching your stop'}
+                  {selectedVehicle.towardStop && selectedVehicle.isApproachingStop ? selectedVehicle.arrivalClockTime : ''}
                 </div>
               </div>
             </div>
@@ -998,7 +988,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
                   <Compass className="w-3 h-3 text-blue-500" /> Heading
                 </div>
-                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">Your way ({selectedVehicle.heading}°)</div>
+                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{selectedVehicle.heading}°</div>
               </div>
               <div className="bg-slate-100/70 dark:bg-slate-800/60 p-2 rounded-xl">
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Seats</div>
