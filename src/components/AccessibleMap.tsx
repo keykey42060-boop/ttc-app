@@ -183,6 +183,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
       (vehicles || []).forEach((vehicle) => {
         const state = anims.get(vehicle.id);
+        const sourceUpdatedAt = Date.parse(vehicle.lastUpdated) || Date.now();
         if (!state) {
           anims.set(vehicle.id, {
             currentLat: vehicle.lat,
@@ -192,17 +193,21 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             currentHeading: vehicle.heading,
             targetHeading: vehicle.heading,
             speedKmH: vehicle.speedKmH,
-            lastUpdate: now,
+            lastUpdate: sourceUpdatedAt,
           });
-        } else {
+        } else if (
+          sourceUpdatedAt > state.lastUpdate ||
+          Math.abs(state.targetLat - vehicle.lat) > 0.000001 ||
+          Math.abs(state.targetLng - vehicle.lng) > 0.000001
+        ) {
           state.targetLat = vehicle.lat;
           state.targetLng = vehicle.lng;
           state.targetHeading = vehicle.heading;
           state.speedKmH = vehicle.speedKmH;
-          state.lastUpdate = now;
+          state.lastUpdate = sourceUpdatedAt;
         }
       });
-      setLastFeedSync(new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }));
+      const newestUpdate = (vehicles || []).map((vehicle) => Date.parse(vehicle.lastUpdated)).filter(Number.isFinite).sort((a, b) => b - a)[0];\n      setLastFeedSync(newestUpdate ? `TTC updated ${Math.max(0, Math.floor((Date.now() - newestUpdate) / 1000))}s ago` : 'Waiting for TTC vehicles');
     } catch (err) {
       console.error('Fast feed refresh error:', err);
     }
@@ -249,7 +254,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           const dLat = state.targetLat - state.currentLat;
           const dLng = state.targetLng - state.currentLng;
           const distSq = dLat * dLat + dLng * dLng;
-          if (distSq < 0.0000001 && state.speedKmH > 0) {
+          if (distSq < 0.0000001 && state.speedKmH > 0 && Date.now() - state.lastUpdate < 15000) {
             // ~22 km/h is ~6.1 meters per second
             const metersMove = (state.speedKmH * 1000 / 3600) * dt;
             const headingRad = (state.currentHeading * Math.PI) / 180;
