@@ -91,7 +91,7 @@ function decodeVehicles(bytes: Uint8Array): Array<Record<string, unknown>> {
 
       const directionId = numberValue(trip, 6);
       const bearing = numberValue(position, 3) ?? 0;
-      const speedMps = numberValue(position, 5) ?? 0;
+      const speedMps = numberValue(position, 5);
       const occupancy = numberValue(vehicle, 9);
       const vid = stringValue(descriptor, 1) || stringValue(descriptor, 2) || stringValue(entity, 1);
       const timestamp = numberValue(vehicle, 5);
@@ -104,7 +104,7 @@ function decodeVehicles(bytes: Uint8Array): Array<Record<string, unknown>> {
         lon: String(lon),
         hdg: String(bearing),
         // The client converts the BusTime speed field from mph to km/h.
-        spd: String(speedMps * 2.236936),
+        spd: speedMps === undefined ? '' : String(speedMps * 2.236936),
         rtdir: direction,
         des: direction === 'East' ? 'Towards Hennick Bridgepoint Hospital' : 'Towards Union Station',
         psgld: occupancy === 1 ? 'EMPTY' : occupancy === 2 ? 'HALF_EMPTY' : occupancy === 3 ? 'HALF_FULL' : occupancy && occupancy >= 4 ? 'FULL' : '',
