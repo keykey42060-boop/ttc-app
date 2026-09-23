@@ -21,6 +21,7 @@ export interface RealTTCVehicle {
   arrivalClockTime: string;
   lastUpdated: string;
   isClosest: boolean;
+  towardStop: boolean;
 }
 
 // Haversine distance formula in meters
@@ -109,13 +110,14 @@ export async function fetchLiveTTCVehicles(
         arrivalClockTime: arrivalClock,
         lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
         isClosest: false,
+        towardStop: direction === expectedBusDir,
       }];
     });
 
-    const matchingDirection = parsed.filter(vehicle => vehicle.direction === expectedBusDir);
-    matchingDirection.sort((a, b) => a.distanceMeters - b.distanceMeters);
-    if (matchingDirection.length) matchingDirection[0].isClosest = true;
-    return matchingDirection;
+    parsed.sort((a, b) => Number(b.towardStop) - Number(a.towardStop) || a.distanceMeters - b.distanceMeters);
+    const closestApproaching = parsed.find((vehicle) => vehicle.towardStop);
+    if (closestApproaching) closestApproaching.isClosest = true;
+    return parsed;
   } catch {
     return [];
   } finally {
