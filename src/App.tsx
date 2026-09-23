@@ -206,7 +206,7 @@ export default function App() {
       )}
 
       {/* MAIN VIEW CONTENT: Big Text (Default) OR Accessible Map View */}
-      <main className={`flex-1 flex flex-col ${viewMode === 'map' ? 'h-screen w-screen overflow-hidden' : 'justify-start'}`}>
+      <main className={`flex-1 flex flex-col ${viewMode === 'map' ? 'h-[calc(100dvh-4.25rem)] min-h-0 w-full overflow-hidden md:h-dvh' : 'justify-start'}`}>
         {viewMode === 'text' ? (
           <BigTextView
             route={activeRoute}
