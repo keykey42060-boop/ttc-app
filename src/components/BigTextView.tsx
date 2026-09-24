@@ -37,6 +37,13 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
   const customMinutes = settings.customNotificationMinutes || [10, 5];
 
   if (liveVehicleCount === 0) {
+    const interval = route.scheduledIntervalMinutes || 10;
+    const now = new Date();
+    const upcoming = Array.from({ length: 3 }, (_, i) => {
+      const arrival = new Date(now.getTime() + (i + 1) * interval * 60000);
+      return arrival.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    });
+
     return (
       <div className={`flex flex-col w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 ${
         isYellowContrast ? 'text-yellow-300' : isNight ? 'text-slate-100' : 'text-slate-900'
@@ -61,12 +68,85 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
           isNight ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
         }`}>
           <div className="text-6xl mb-5">🚌</div>
-          <h1 className="text-3xl sm:text-5xl font-black">No buses right now</h1>
+          <h1 className="text-3xl sm:text-5xl font-black">No live buses right now</h1>
           <p className="mt-4 text-lg sm:text-2xl font-bold opacity-80">
             TTC Route 121 is not currently running. Please check again later.
           </p>
           <p className="mt-4 text-sm sm:text-base font-semibold opacity-60">
             Live arrivals and alerts will appear here when service resumes.
+          </p>
+        </div>
+
+        {/* SCHEDULED ARRIVAL ESTIMATES */}
+        <div className={`p-6 sm:p-8 rounded-3xl border-3 shadow-lg ${
+          isYellowContrast
+            ? 'bg-black border-yellow-400'
+            : isNight
+            ? 'bg-slate-900 border-slate-700'
+            : 'bg-white border-slate-300'
+        }`}>
+          <div className="flex items-center gap-3 pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
+            <Clock className="w-7 h-7 text-red-600" />
+            <div>
+              <p className="text-xs sm:text-sm uppercase font-black tracking-wider opacity-75">
+                Scheduled Arrivals at {route.myStopName}
+              </p>
+              <h2 className="text-xl sm:text-2xl font-black">
+                TTC #{route.routeNumber} — {isGoingToWork ? 'Eastbound' : 'Westbound'}
+              </h2>
+            </div>
+          </div>
+
+          <p className="mt-4 text-sm font-bold opacity-70">
+            Buses typically run every {interval} minutes. Next estimated arrivals:
+          </p>
+
+          <div className="mt-4 space-y-3">
+            {upcoming.map((clockTime, i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-4 p-4 rounded-2xl ${
+                  i === 0
+                    ? isYellowContrast
+                      ? 'bg-yellow-400/10 border-2 border-yellow-400'
+                      : isNight
+                      ? 'bg-slate-800 border-2 border-red-500/50'
+                      : 'bg-red-50 border-2 border-red-200'
+                    : isNight
+                    ? 'bg-slate-800/60'
+                    : 'bg-slate-50'
+                }`}
+              >
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center font-black text-lg shadow-sm ${
+                  i === 0
+                    ? 'bg-red-600 text-white'
+                    : isNight
+                    ? 'bg-slate-700 text-slate-200'
+                    : 'bg-slate-200 text-slate-700'
+                }`}>
+                  {i + 1}{i === 0 ? 'st' : i === 1 ? 'nd' : 'rd'}
+                </div>
+                <div className="flex-1 text-left">
+                  <p className={`font-black ${i === 0 ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+                    {clockTime}
+                  </p>
+                  <p className="text-sm font-bold opacity-70">
+                    {i === 0 ? 'Next scheduled bus' : `+${(i + 1) * interval} min from now`}
+                  </p>
+                </div>
+                {i === 0 && (
+                  <span className="px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-black text-xs flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    Up Next
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-5 text-xs font-semibold opacity-50 text-center">
+            These are approximate scheduled times. Actual arrivals may vary.
+            Switch to the live map when buses are running for real-time GPS tracking.
           </p>
         </div>
       </div>
