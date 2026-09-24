@@ -162,7 +162,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     }
   }, []);
 
-  // Ultra-fast network fetch (every 1.5 seconds)
+  // Near-real-time polling: keeps updates fast enough to feel live while preserving smooth map motion.
   const refreshTTCFeed = useCallback(async () => {
     try {
       const vehicles = await fetchLiveTTCVehicles(
@@ -208,10 +208,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     }
   }, [activeMomStop.lat, activeMomStop.lng, route.direction]);
 
-  // Ultra-fast polling interval: 1.5 seconds (1500ms) for true real-time responsiveness
+  // Poll at ~1 second for a noticeably more live, near-real-time feel without overloading the feed.
   useEffect(() => {
     refreshTTCFeed();
-    const interval = setInterval(refreshTTCFeed, 1500);
+    const interval = setInterval(refreshTTCFeed, 1000);
     return () => clearInterval(interval);
   }, [refreshTTCFeed]);
 
@@ -240,8 +240,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
       if (map && anims.size > 0) {
         anims.forEach((state, id) => {
-          // Smooth Lerp towards target coordinate (interpolates smoothly over frames)
-          const lerpFactor = Math.min(1.0, dt * 5.5);
+          // Easing curve tuned for near-real-time motion: quick enough to react to fresh GPS, smooth enough to avoid jitter.
+          const lerpFactor = 0.18 + Math.min(0.72, dt * 15);
           state.currentLat += (state.targetLat - state.currentLat) * lerpFactor;
           state.currentLng += (state.targetLng - state.currentLng) * lerpFactor;
 
@@ -250,8 +250,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           const dLng = state.targetLng - state.currentLng;
           const distSq = dLat * dLat + dLng * dLng;
           if (distSq < 0.0000001 && state.speedKmH > 0) {
-            // ~22 km/h is ~6.1 meters per second
-            const metersMove = (state.speedKmH * 1000 / 3600) * dt;
+            const metersMove = (state.speedKmH * 1000 / 3600) * dt * 1.1;
             const headingRad = (state.currentHeading * Math.PI) / 180;
             state.currentLat += (metersMove * Math.cos(headingRad)) / 111100;
             state.currentLng += (metersMove * Math.sin(headingRad)) / 80600;
@@ -259,7 +258,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
           // Shortest-arc heading angle interpolation (no 360 degree snap spinning)
           let deltaH = (state.targetHeading - state.currentHeading + 540) % 360 - 180;
-          state.currentHeading = (state.currentHeading + deltaH * Math.min(1.0, dt * 6.0) + 360) % 360;
+          state.currentHeading = (state.currentHeading + deltaH * Math.min(1.0, dt * 12.0) + 360) % 360;
 
           // Update Leaflet marker position at 60 FPS
           const marker = markers.get(id);
@@ -276,9 +275,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             }
           }
 
-          // Camera smooth follow if active
+          // Camera smooth follow if active: animate gently so the map stays attached without jitter.
           if (followBusId === id && map) {
-            map.panTo([state.currentLat, state.currentLng], { animate: false });
+            map.panTo([state.currentLat, state.currentLng], {
+              animate: true,
+              duration: 0.25,
+              noMoveStart: true,
+            });
           }
         });
       }
@@ -1058,8 +1061,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           </div>
         )}
 
-        {/* Floating Navigation & Zoom Controls (Bottom-Right) */}
-        <div className="absolute right-3 bottom-4 z-[500] flex flex-col items-center gap-2">
+        {/* Floating Navigation & Zoom Controls (Upper-Right, away from bus card) */}
+        <div className="absolute right-3 top-20 z-[500] flex flex-col items-center gap-2">
           {/* Zoom Buttons Group */}
           <div className="flex flex-col items-center bg-white/85 dark:bg-slate-900/85 p-1 rounded-2xl border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl">
             <button
