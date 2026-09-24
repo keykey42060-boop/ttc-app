@@ -41,6 +41,7 @@ interface AccessibleMapProps {
   onToggleCommute?: (direction: 'to_work' | 'to_home') => void;
   onOpenCaregiver?: () => void;
   onOpenNotifications?: () => void;
+  onLiveVehicleCountChange?: (count: number) => void;
 }
 
 type MapLayerType = 'detailed' | 'satellite' | 'contrast';
@@ -69,6 +70,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   onToggleCommute,
   onOpenCaregiver,
   onOpenNotifications,
+  onLiveVehicleCountChange,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -103,6 +105,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const [currentZoom, setCurrentZoom] = useState<number>(15.5);
   const [fpsCounter, setFpsCounter] = useState<number>(60);
   const [etaTick, setEtaTick] = useState<number>(0);
+  const [showMapOptions, setShowMapOptions] = useState(false);
   const feedRequestRef = useRef(0);
 
   const isGoingToWork = route.direction === 'to_work';
@@ -124,6 +127,21 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     if (stopCode === '6375' || stopCode === '11169') return '🏪 St. Lawrence Market';
     if (stopCode === '16754' || stopCode === '246') return '🚉 Union Station';
     return null;
+  };
+
+  const getNearestRouteDistance = (stop: TTCStopInfo, polyline: [number, number][]) => {
+    return polyline.reduce((nearest, [lat, lng]) => {
+      return Math.min(nearest, getDistanceMeters(stop.lat, stop.lng, lat, lng));
+    }, Infinity);
+  };
+
+  const isStopForActiveDirection = (stop: TTCStopInfo) => {
+    if (stop.code === MOM_HOME_STOP.code) return !isGoingToWork;
+    if (stop.code === MOM_WORK_STOP.code) return isGoingToWork;
+
+    const activePolyline = isGoingToWork ? ROUTE_121_EASTBOUND_POLYLINE : ROUTE_121_WESTBOUND_POLYLINE;
+    const oppositePolyline = isGoingToWork ? ROUTE_121_WESTBOUND_POLYLINE : ROUTE_121_EASTBOUND_POLYLINE;
+    return getNearestRouteDistance(stop, activePolyline) <= getNearestRouteDistance(stop, oppositePolyline);
   };
 
   // Switch basemap tiles
@@ -182,6 +200,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
       if (vehicles) {
         setLiveVehicles(vehicles);
+        onLiveVehicleCountChange?.(vehicles.length);
 
         // Update animation target state
         const anims = animStatesRef.current;
@@ -214,7 +233,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     } catch (err) {
       console.error('Fast feed refresh error:', err);
     }
-  }, [activeMomStop.lat, activeMomStop.lng, route.direction]);
+  }, [activeMomStop.lat, activeMomStop.lng, onLiveVehicleCountChange, route.direction]);
 
   // Poll aggressively for the most live feel possible without starving the feed
   // 600ms keeps the bus positions responsive while still staying within a normal live-vehicle refresh cadence.
@@ -371,21 +390,29 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         : 'background: #1E3A8A; color: #EFF6FF; border: 1.5px solid #60A5FA;';
 
       return `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; cursor: pointer;">
+        <div style="position: relative; width: 150px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; user-select: none; cursor: pointer;">
           <!-- Realistic Landmark Capsule -->
           <div style="padding: 3.5px 10px; border-radius: 9999px; font-size: 10.5px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; ${badgeBg} box-shadow: 0 4px 14px rgba(0,0,0,0.25); margin-bottom: 3px; white-space: nowrap; display: flex; align-items: center; gap: 4px;">
             ${landmarkText}
           </div>
-          <!-- Clean transit roundel -->
-          <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #FFFFFF; border: 3px solid #DC2626; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;">
-            <div style="width: 4px; height: 4px; border-radius: 50%; background-color: #DC2626;"></div>
+          <!-- Compact TTC stop roundel -->
+          <div style="position: relative; width: 28px; height: 24px; display: flex; align-items: flex-start; justify-content: center;">
+            <div style="position: absolute; top: 0; width: 22px; height: 22px; border-radius: 50%; background: #DC2626; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+              <div style="width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #FFFFFF; background: #B91C1C;"></div>
+            </div>
+            <div style="position: absolute; bottom: 0; width: 10px; height: 3px; border-radius: 50%; background: rgba(15,23,42,0.25);"></div>
           </div>
         </div>
       `;
     }
 
     return `
-      <div style="width: 10px; height: 10px; border-radius: 50%; background-color: #FFFFFF; border: 2.5px solid #DC2626; box-shadow: 0 1px 3px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; cursor: pointer;"></div>
+      <div style="position: relative; width: 30px; height: 28px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; cursor: pointer;">
+        <div style="position: absolute; top: 0; width: 23px; height: 23px; border-radius: 50%; background: #DC2626; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid #FFFFFF; background: #B91C1C;"></div>
+        </div>
+        <div style="position: absolute; bottom: 0; width: 13px; height: 4px; border-radius: 50%; background: rgba(15,23,42,0.28);"></div>
+      </div>
     `;
   };
 
@@ -474,8 +501,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       icon: L.divIcon({
         html: createMomStopIcon(activeMomStop.code, false),
         className: 'mom-stop-beacon-marker',
-        iconSize: [92, 52],
-        iconAnchor: [46, 38],
+        iconSize: [104, 54],
+        iconAnchor: [52, 54],
       }),
       zIndexOffset: 1500,
     }).addTo(map);
@@ -524,8 +551,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         L.divIcon({
           html: createMomStopIcon(activeMomStop.code, false),
           className: 'mom-stop-beacon-marker',
-          iconSize: [92, 52],
-          iconAnchor: [46, 38],
+          iconSize: [104, 54],
+          iconAnchor: [52, 54],
         })
       );
     }
@@ -536,6 +563,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
     ROUTE_121_STOPS.forEach((stop) => {
       if (stop.code === activeMomStop.code) return;
+      if (!isStopForActiveDirection(stop)) return;
 
       const landmark = getMainLandmark(stop.code);
       const isLandmark = Boolean(landmark);
@@ -544,15 +572,15 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         icon: L.divIcon({
           html: createStopIcon(stop, landmark),
           className: isLandmark ? 'ttc-landmark-stop-marker' : 'ttc-clean-stop-marker',
-          iconSize: isLandmark ? [130, 36] : [10, 10],
-          iconAnchor: isLandmark ? [65, 30] : [5, 5],
+          iconSize: isLandmark ? [150, 52] : [30, 28],
+          iconAnchor: isLandmark ? [75, 52] : [15, 28],
         }),
         zIndexOffset: isLandmark ? 600 : 350,
       }).addTo(map);
 
       stopMarker.bindTooltip(`<strong>${stop.name}</strong><br><span style="font-size:10px;color:#8E8E93">TTC Stop #${stop.code}</span>`, {
         direction: 'top',
-        offset: [0, -5],
+        offset: [0, -10],
         className: 'compact-stop-tooltip',
       });
 
@@ -801,7 +829,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {/* Big Text View Button for Mom */}
           <button
             onClick={onSwitchToBigText}
-            className="px-2 sm:px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm transition-all active:scale-95"
+            className="hidden sm:flex px-2 sm:px-3 py-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs items-center gap-1.5 shadow-sm transition-all active:scale-95"
             title="Switch to Senior Big Text View"
           >
             <Volume2 className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -821,7 +849,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onOpenNotifications && (
             <button
               onClick={onOpenNotifications}
-              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
+              className="hidden sm:flex p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
               title="Notification Settings"
             >
               <Bell className="w-4 h-4 text-amber-500" />
@@ -830,7 +858,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           {onOpenCaregiver && (
             <button
               onClick={onOpenCaregiver}
-              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
+              className="hidden sm:flex p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors shadow-xs border border-black/5 dark:border-white/10"
               title="Caregiver Testing Panel"
             >
               <Sliders className="w-4 h-4" />
@@ -844,13 +872,19 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       {/* ============================================================== */}
       <div className="z-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-black/5 dark:border-white/10 px-3 py-1.5 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
         {/* Frame All Buses Button */}
-        <button
-          onClick={fitAllBuses}
-          className="px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs border border-black/5 dark:border-white/10"
-        >
-          <Crosshair className="w-3.5 h-3.5 text-blue-500" />
-          <span>Show All ({liveVehicles.length} Buses)</span>
-        </button>
+        {liveVehicles.length > 0 ? (
+          <button
+            onClick={fitAllBuses}
+            className="px-2.5 py-1 rounded-full bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold flex items-center gap-1.5 shrink-0 transition-colors shadow-2xs border border-black/5 dark:border-white/10"
+          >
+            <Crosshair className="w-3.5 h-3.5 text-blue-500" />
+            <span>Show All ({liveVehicles.length} Buses)</span>
+          </button>
+        ) : (
+          <div className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold shrink-0 border border-amber-500/30">
+            No Route 121 buses are currently active
+          </div>
+        )}
 
         {/* Individual Bus Chips */}
         {liveVehicles.map((v, i) => {
@@ -912,7 +946,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         <div ref={mapContainerRef} className="w-full h-full absolute inset-0 z-0 bg-[#E5E0D8]" />
 
         {/* Map Layer Mode Switcher (Top-Right) */}
-        <div className="absolute top-3 right-3 z-[500] flex items-center bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 rounded-2xl p-1 shadow-xl backdrop-blur-xl text-xs font-bold text-slate-600 dark:text-slate-300">
+        <button
+          onClick={() => setShowMapOptions((open) => !open)}
+          className="sm:hidden absolute top-3 right-3 z-[501] px-3 py-2 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl text-xs font-bold text-slate-700 dark:text-slate-200"
+        >
+          Map options
+        </button>
+        <div className={`${showMapOptions ? 'flex' : 'hidden'} sm:flex absolute top-3 right-3 sm:right-3 z-[500] items-center bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 rounded-2xl p-1 shadow-xl backdrop-blur-xl text-xs font-bold text-slate-600 dark:text-slate-300`}>
           <button
             onClick={() => setMapTheme('detailed')}
             className={`px-2.5 sm:px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
@@ -1129,13 +1169,15 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
           </div>
 
           {/* Quick Fit Camera Button */}
-          <button
-            onClick={fitAllBuses}
-            className="w-10 h-10 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
-            title="Recenter and Fit All Buses"
-          >
-            <Crosshair className="w-4 h-4" />
-          </button>
+          {liveVehicles.length > 0 && (
+            <button
+              onClick={fitAllBuses}
+              className="w-10 h-10 rounded-2xl bg-white/85 dark:bg-slate-900/85 border border-black/10 dark:border-white/15 shadow-xl backdrop-blur-xl flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all active:scale-95"
+              title="Recenter and Fit All Buses"
+            >
+              <Crosshair className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -27,12 +27,13 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'map' | 'text'>('map'); // Default to the sleek Live Map as requested!
   const [showNotificationModal, setShowNotificationModal] = useState<boolean>(false);
   const [showTestPanel, setShowTestPanel] = useState<boolean>(false);
+  const [liveVehicleCount, setLiveVehicleCount] = useState(0);
   const [settings, setSettings] = useState<AccessibilitySettings>(() => {
     try {
       const saved = localStorage.getItem('clearride_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return { ...parsed, theme: parsed.theme || 'night' };
+        return { ...parsed, theme: parsed.theme === 'daylight' ? 'daylight' : 'night' };
       }
       return DEFAULT_SETTINGS;
     } catch {
@@ -47,15 +48,20 @@ export default function App() {
     setActiveToast(null);
   }, [commuteDirection]);
 
+  useEffect(() => {
+    if (liveVehicleCount === 0) setActiveToast(null);
+  }, [liveVehicleCount]);
+
   const activeRoute: BusRouteConfig = commuteDirection === 'to_work' ? ROUTE_TO_WORK : ROUTE_TO_HOME;
 
   const handleNotificationTrigger = useCallback((minutesAway: number, title: string, body: string) => {
+    if (liveVehicleCount === 0) return;
     setActiveToast({ title, body });
     // auto dismiss toast after 6s
     setTimeout(() => {
       setActiveToast((prev) => (prev?.title === title ? null : prev));
     }, 6000);
-  }, []);
+  }, [liveVehicleCount]);
 
   const openNotificationModal = () => {
     setActiveToast(null);
@@ -66,15 +72,11 @@ export default function App() {
     state: busState,
     progress,
     setProgress,
-    isPlaying,
-    setIsPlaying,
-    simulationSpeedMultiplier,
-    setSimulationSpeedMultiplier,
     speakCurrentStatus,
-    jumpToStage,
   } = useBusSimulation({
     route: activeRoute,
     settings,
+    liveVehicleCount,
     onNotificationTrigger: handleNotificationTrigger,
   });
 
@@ -92,6 +94,10 @@ export default function App() {
 
   const isNight = settings.theme === 'night';
   const isYellowContrast = settings.theme === 'contrast-yellow';
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isNight);
+  }, [isNight]);
 
   return (
     <div
@@ -239,6 +245,7 @@ export default function App() {
             route={activeRoute}
             busState={busState}
             settings={settings}
+            liveVehicleCount={liveVehicleCount}
             onSwitchToMap={() => setViewMode('map')}
             onOpenNotifications={openNotificationModal}
             onSpeak={speakCurrentStatus}
@@ -254,6 +261,7 @@ export default function App() {
             onToggleCommute={(dir) => setCommuteDirection(dir)}
             onOpenCaregiver={() => setShowTestPanel(true)}
             onOpenNotifications={openNotificationModal}
+            onLiveVehicleCountChange={setLiveVehicleCount}
           />
         )}
       </main>
@@ -294,10 +302,11 @@ export default function App() {
 
         <button
           onClick={openNotificationModal}
+          disabled={liveVehicleCount === 0}
           className={`flex min-w-0 w-full flex-col items-center justify-center p-1.5 rounded-xl min-h-[52px] gap-1 transition-colors ${isNight ? 'text-slate-500' : 'text-slate-400'} active:text-amber-500`}
         >
           <Bell className="w-5 h-5 stroke-[2.5]" />
-          <span className="text-[10px] font-bold leading-none">Alerts</span>
+          <span className="text-[10px] font-bold leading-none">{liveVehicleCount === 0 ? 'No Alerts' : 'Alerts'}</span>
         </button>
 
         <a
@@ -332,16 +341,9 @@ export default function App() {
       {/* CAREGIVER "TEST WITH HER" CONTROLS DRAWER */}
       {showTestPanel && (
         <TestWithHerPanel
-          route={activeRoute}
-          busState={busState}
-          settings={settings}
-          isPlaying={isPlaying}
-          simulationSpeedMultiplier={simulationSpeedMultiplier}
-          onTogglePlay={() => setIsPlaying(!isPlaying)}
-          onSetSpeed={setSimulationSpeedMultiplier}
-          onJumpStage={jumpToStage}
-          onUpdateSettings={updateSettings}
-          onClose={() => setShowTestPanel(false)}
+        settings={settings}
+        onUpdateSettings={updateSettings}
+        onClose={() => setShowTestPanel(false)}
         />
       )}
     </div>

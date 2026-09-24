@@ -6,6 +6,7 @@ interface BigTextViewProps {
   route: BusRouteConfig;
   busState: BusState;
   settings: AccessibilitySettings;
+  liveVehicleCount: number;
   onSwitchToMap: () => void;
   onOpenNotifications: () => void;
   onSpeak: () => void;
@@ -16,6 +17,7 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
   route,
   busState,
   settings,
+  liveVehicleCount,
   onSwitchToMap,
   onOpenNotifications,
   onSpeak,
@@ -33,6 +35,43 @@ export const BigTextView: React.FC<BigTextViewProps> = ({
   const bodySizeClass = isHuge ? 'text-2xl sm:text-3xl' : isXLarge ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl';
 
   const customMinutes = settings.customNotificationMinutes || [10, 5];
+
+  if (liveVehicleCount === 0) {
+    return (
+      <div className={`flex flex-col w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 ${
+        isYellowContrast ? 'text-yellow-300' : isNight ? 'text-slate-100' : 'text-slate-900'
+      }`}>
+        <div className={`p-2 rounded-2xl border-2 flex flex-col sm:flex-row items-center gap-2 shadow-sm ${
+          isYellowContrast ? 'bg-black border-yellow-500' : isNight ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+        }`}>
+          <button
+            onClick={() => onToggleCommute('to_work')}
+            className={`flex-1 w-full py-4 px-5 rounded-xl font-black text-lg ${isGoingToWork ? 'bg-red-600 text-white' : 'text-slate-500'}`}
+          >
+            💼 Going To Work
+          </button>
+          <button
+            onClick={() => onToggleCommute('to_home')}
+            className={`flex-1 w-full py-4 px-5 rounded-xl font-black text-lg ${!isGoingToWork ? 'bg-red-600 text-white' : 'text-slate-500'}`}
+          >
+            🏡 Coming Home
+          </button>
+        </div>
+        <div className={`p-8 sm:p-12 rounded-3xl border-3 shadow-lg text-center ${
+          isNight ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'
+        }`}>
+          <div className="text-6xl mb-5">🚌</div>
+          <h1 className="text-3xl sm:text-5xl font-black">No buses right now</h1>
+          <p className="mt-4 text-lg sm:text-2xl font-bold opacity-80">
+            TTC Route 121 is not currently running. Please check again later.
+          </p>
+          <p className="mt-4 text-sm sm:text-base font-semibold opacity-60">
+            Live arrivals and alerts will appear here when service resumes.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex flex-col w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 ${
