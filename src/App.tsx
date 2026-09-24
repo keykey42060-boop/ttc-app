@@ -6,7 +6,8 @@ import { BigTextView } from './components/BigTextView';
 import { AccessibleMap } from './components/AccessibleMap';
 import { NotificationPrototypeModal } from './components/NotificationPrototypeModal';
 import { TestWithHerPanel } from './components/TestWithHerPanel';
-import { Volume2, Map as MapIcon, Sliders, Bell, Phone, MessageSquare } from 'lucide-react';
+import { Volume2, Map as MapIcon, Sliders, Bell, Phone, MessageSquare, Download } from 'lucide-react';
+import { downloadErrorLog } from './utils/errorLogger';
 
 const DEFAULT_SETTINGS: AccessibilitySettings = {
   textSize: 'xlarge',
@@ -204,6 +205,19 @@ export default function App() {
             >
               <Volume2 className="w-4 h-4 stroke-[2.5]" />
               <span>Read Aloud</span>
+            </button>
+
+            <button
+              onClick={downloadErrorLog}
+              className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center gap-2 border transition-transform active:scale-95 ${
+                isYellowContrast
+                  ? 'border-yellow-500 bg-black text-yellow-300'
+                  : 'border-slate-300 bg-white/80 text-slate-700 hover:bg-slate-50'
+              }`}
+              title="Download crash/error log"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Log</span>
             </button>
 
             {/* Quick Caregiver settings gear for mobile */}
