@@ -22,6 +22,20 @@ function appendLogLine(line) {
 
 app.use(express.json({ limit: '1mb' }));
 
+app.get('/api/vehicle-positions', async (req, res) => {
+  const route = String(req.query.route || '121');
+  const upstreamUrl = `https://ttcmapsapi-ewacfyffhjffhces.canadacentral-01.azurewebsites.net/api/vehicle-positions?route=${encodeURIComponent(route)}`;
+
+  try {
+    const response = await fetch(upstreamUrl, { cache: 'no-store' });
+    const body = await response.text();
+    res.status(response.status).type('application/json').send(body);
+  } catch (error) {
+    console.error('TTC vehicle feed proxy error:', error);
+    res.status(502).json({ error: 'TTC vehicle feed unavailable' });
+  }
+});
+
 app.post('/api/log', (req, res) => {
   const payload = req.body || {};
   const message = payload.message || 'Unknown error';

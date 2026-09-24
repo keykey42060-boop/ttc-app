@@ -9,6 +9,8 @@ import {
   MOM_HOME_STOP,
 } from '../data/ttc121Geometry';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 export interface RealTTCVehicle {
   id: string;
   vehicleNumber: string;
@@ -133,7 +135,7 @@ export async function fetchLiveTTCVehicles(
 
     // The response uses the standard bustime-response.vehicle shape.
     const response = await fetch(
-      `/api/vehicle-positions?route=${encodeURIComponent(routeNum)}&_ts=${Date.now()}`,
+      `${API_BASE_URL}/api/vehicle-positions?route=${encodeURIComponent(routeNum)}&_ts=${Date.now()}`,
       { cache: 'no-store', signal: controller.signal }
     );
     clearTimeout(timeoutId);
