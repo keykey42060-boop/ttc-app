@@ -142,7 +142,9 @@ export async function fetchLiveTTCVehicles(
       const data = await response.json();
       const rawVehicles = data?.['bustime-response']?.vehicle || [];
 
-      if (Array.isArray(rawVehicles) && rawVehicles.length > 0) {
+      if (Array.isArray(rawVehicles)) {
+        if (rawVehicles.length === 0) return [];
+
         const now = new Date();
 
         const parsed: RealTTCVehicle[] = rawVehicles.map((v: any) => {
@@ -220,6 +222,7 @@ export async function fetchLiveTTCVehicles(
   }
 
   // 2. Continuous real-time street motion along official GTFS centerline
+  // This is only used when the live endpoint itself is unavailable.
   return generateContinuous121Vehicles(momStopLat, momStopLng, isGoingHome);
 }
 

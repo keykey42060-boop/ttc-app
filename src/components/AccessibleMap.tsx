@@ -180,7 +180,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       );
       if (requestId !== feedRequestRef.current) return;
 
-      if (vehicles && vehicles.length > 0) {
+      if (vehicles) {
         setLiveVehicles(vehicles);
 
         // Update animation target state
