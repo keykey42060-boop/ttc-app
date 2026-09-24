@@ -56,6 +56,11 @@ export default function App() {
     }, 6000);
   }, []);
 
+  const openNotificationModal = () => {
+    setActiveToast(null);
+    setShowNotificationModal(true);
+  };
+
   const {
     state: busState,
     progress,
@@ -213,7 +218,7 @@ export default function App() {
             busState={busState}
             settings={settings}
             onSwitchToMap={() => setViewMode('map')}
-            onOpenNotifications={() => setShowNotificationModal(true)}
+            onOpenNotifications={openNotificationModal}
             onSpeak={speakCurrentStatus}
             onToggleCommute={(dir) => setCommuteDirection(dir)}
           />
@@ -226,7 +231,7 @@ export default function App() {
             onSpeak={speakCurrentStatus}
             onToggleCommute={(dir) => setCommuteDirection(dir)}
             onOpenCaregiver={() => setShowTestPanel(true)}
-            onOpenNotifications={() => setShowNotificationModal(true)}
+            onOpenNotifications={openNotificationModal}
           />
         )}
       </main>
@@ -266,7 +271,7 @@ export default function App() {
         </button>
 
         <button
-          onClick={() => setShowNotificationModal(true)}
+          onClick={openNotificationModal}
           className={`flex min-w-0 w-full flex-col items-center justify-center p-1.5 rounded-xl min-h-[52px] gap-1 transition-colors ${isNight ? 'text-slate-500' : 'text-slate-400'} active:text-amber-500`}
         >
           <Bell className="w-5 h-5 stroke-[2.5]" />
