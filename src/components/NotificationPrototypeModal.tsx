@@ -85,16 +85,16 @@ export const NotificationPrototypeModal: React.FC<NotificationPrototypeModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border-2 border-slate-300 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-3 sm:p-4 pb-20 sm:pb-4 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-2 border-slate-300 dark:border-slate-700 max-h-[calc(100dvh-5rem)] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
               <Bell className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-2xl font-black">Set Up When to Notify Mom</h2>
+              <h2 className="text-lg sm:text-2xl font-black leading-tight">Set Up When to Notify Mom</h2>
               <p className="text-xs sm:text-sm font-semibold opacity-75">
                 Customize alert distance and minutes away for TTC Bus 121
               </p>
@@ -102,7 +102,7 @@ export const NotificationPrototypeModal: React.FC<NotificationPrototypeModalProp
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white shrink-0"
             aria-label="Close"
           >
             <X className="w-6 h-6" />
