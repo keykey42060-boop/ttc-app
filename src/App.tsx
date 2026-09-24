@@ -103,23 +103,31 @@ export default function App() {
       }`}
     >
       {/* IN-APP REAL-TIME TOAST ALERT (When 10 min or 5 min triggers) */}
-      {activeToast && !showNotificationModal && (
+      {activeToast && (
         <aside
           aria-live="polite"
-          className="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-11/12 max-w-lg p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/95 text-slate-900 sm:bg-red-600 sm:text-white shadow-lg sm:shadow-2xl border border-red-200 sm:border-2 sm:border-white flex items-center justify-between gap-2 sm:gap-3 animate-bounce backdrop-blur-sm"
+          className={`fixed z-[70] flex items-center justify-between gap-2 animate-bounce backdrop-blur-sm ${
+            showNotificationModal
+              ? 'top-2 right-2 w-auto max-w-[170px] p-1.5 rounded-lg bg-white/95 text-slate-900 shadow-md border border-red-200'
+              : 'top-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] sm:w-11/12 max-w-lg p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/95 text-slate-900 sm:bg-red-600 sm:text-white shadow-lg sm:shadow-2xl border border-red-200 sm:border-2 sm:border-white'
+          }`}
         >
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <span className="text-2xl sm:text-3xl">🚌</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className={showNotificationModal ? 'text-base' : 'text-2xl sm:text-3xl'}>🚌</span>
             <div>
-              <p className="font-black text-sm sm:text-base leading-tight">{activeToast.title}</p>
-              <p className="text-[11px] sm:text-xs text-slate-600 sm:text-red-100 mt-0.5">{activeToast.body}</p>
+              <p className={showNotificationModal ? 'font-black text-[10px] leading-tight' : 'font-black text-sm sm:text-base leading-tight'}>
+                {showNotificationModal ? 'Bus update' : activeToast.title}
+              </p>
+              {!showNotificationModal && (
+                <p className="text-[11px] sm:text-xs text-slate-600 sm:text-red-100 mt-0.5">{activeToast.body}</p>
+              )}
             </div>
           </div>
           <button
             onClick={() => setActiveToast(null)}
-            className="shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-slate-900/10 sm:bg-black/20 hover:bg-slate-900/20 sm:hover:bg-black/30 font-bold text-[11px] sm:text-xs"
+            className="shrink-0 px-1.5 py-0.5 rounded-md bg-slate-900/10 hover:bg-slate-900/20 font-bold text-[10px]"
           >
-            Dismiss
+            {showNotificationModal ? '×' : 'Dismiss'}
           </button>
         </aside>
       )}
