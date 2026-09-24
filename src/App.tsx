@@ -103,7 +103,7 @@ export default function App() {
       }`}
     >
       {/* IN-APP REAL-TIME TOAST ALERT (When 10 min or 5 min triggers) */}
-      {activeToast && !showNotificationModal && (
+      {activeToast && viewMode === 'map' && !showNotificationModal && (
         <aside
           aria-live="polite"
           className={`fixed z-[70] flex items-center justify-between gap-2 animate-bounce backdrop-blur-sm ${
