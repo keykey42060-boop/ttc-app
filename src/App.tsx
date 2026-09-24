@@ -103,7 +103,7 @@ export default function App() {
       }`}
     >
       {/* IN-APP REAL-TIME TOAST ALERT (When 10 min or 5 min triggers) */}
-      {activeToast && viewMode === 'map' && !showNotificationModal && (
+      {activeToast && viewMode === 'map' && !showNotificationModal && !showTestPanel && (
         <aside
           aria-live="polite"
           className={`fixed z-[70] flex items-center justify-between gap-2 animate-bounce backdrop-blur-sm ${
@@ -219,7 +219,7 @@ export default function App() {
       )}
 
       {/* MAIN VIEW CONTENT: Big Text (Default) OR Accessible Map View */}
-      <main className={`${showNotificationModal ? 'hidden' : 'flex-1 flex flex-col'} ${viewMode === 'map' ? 'h-screen w-screen overflow-hidden' : 'justify-start'}`}>
+      <main className={`${showNotificationModal || showTestPanel ? 'hidden' : 'flex-1 flex flex-col'} ${viewMode === 'map' ? 'h-screen w-screen overflow-hidden' : 'justify-start'}`}>
         {viewMode === 'text' ? (
           <BigTextView
             route={activeRoute}
@@ -246,7 +246,7 @@ export default function App() {
 
       {/* MOBILE BOTTOM NAVIGATION DOCK (Thumb Ergonomics) */}
       <div
-        className={`${showNotificationModal ? 'hidden' : 'lg:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center'} backdrop-blur-md ${
+        className={`${showNotificationModal || showTestPanel ? 'hidden' : 'lg:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center'} backdrop-blur-md ${
           isYellowContrast
             ? 'bg-black/95 border-yellow-500'
             : isNight
