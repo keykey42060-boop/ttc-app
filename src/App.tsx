@@ -208,7 +208,7 @@ export default function App() {
             </button>
 
             <button
-              onClick={downloadErrorLog}
+              onClick={() => downloadErrorLog()}
               className={`py-2 px-3 rounded-xl font-bold text-xs flex items-center gap-2 border transition-transform active:scale-95 ${
                 isYellowContrast
                   ? 'border-yellow-500 bg-black text-yellow-300'

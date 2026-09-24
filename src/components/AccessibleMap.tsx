@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import { BusRouteConfig, BusState, AccessibilitySettings } from '../types/bus';
-import { fetchLiveTTCVehicles, RealTTCVehicle, getDistanceMeters } from '../services/ttcLiveService';
+import { fetchLiveTTCVehicles, RealTTCVehicle, getDistanceMeters, calculateBearing } from '../services/ttcLiveService';
 import {
   ROUTE_121_EASTBOUND_POLYLINE,
   ROUTE_121_WESTBOUND_POLYLINE,
@@ -44,6 +44,10 @@ interface AccessibleMapProps {
 }
 
 type MapLayerType = 'detailed' | 'satellite' | 'contrast';
+
+const formatEtaMinutes = (minutes: number): string => (
+  minutes < 1 ? '<1' : String(Math.ceil(minutes))
+);
 
 interface VehicleAnimState {
   currentLat: number;
@@ -98,6 +102,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   const [followBusId, setFollowBusId] = useState<string | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(15.5);
   const [fpsCounter, setFpsCounter] = useState<number>(60);
+  const [etaTick, setEtaTick] = useState<number>(0);
+  const feedRequestRef = useRef(0);
 
   const isGoingToWork = route.direction === 'to_work';
   const activeMomStop = isGoingToWork ? MOM_WORK_STOP : MOM_HOME_STOP;
@@ -164,6 +170,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
   // Near-real-time polling: keeps updates fast enough to feel live while preserving smooth map motion.
   const refreshTTCFeed = useCallback(async () => {
+    const requestId = ++feedRequestRef.current;
     try {
       const vehicles = await fetchLiveTTCVehicles(
         '121',
@@ -171,6 +178,8 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         activeMomStop.lng,
         route.direction
       );
+      if (requestId !== feedRequestRef.current) return;
+
       if (vehicles && vehicles.length > 0) {
         setLiveVehicles(vehicles);
 
@@ -179,24 +188,23 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         const now = performance.now();
 
         vehicles.forEach((v) => {
-          const snapped = snapPointToRoute(v.lat, v.lng, v.direction);
           const state = anims.get(v.id);
 
           if (!state) {
             anims.set(v.id, {
-              currentLat: snapped.lat,
-              currentLng: snapped.lng,
-              targetLat: snapped.lat,
-              targetLng: snapped.lng,
-              currentHeading: snapped.heading || v.heading,
-              targetHeading: snapped.heading || v.heading,
+              currentLat: v.lat,
+              currentLng: v.lng,
+              targetLat: v.lat,
+              targetLng: v.lng,
+              currentHeading: v.heading,
+              targetHeading: v.heading,
               speedKmH: v.speedKmH || 22,
               lastUpdate: now,
             });
           } else {
-            state.targetLat = snapped.lat;
-            state.targetLng = snapped.lng;
-            state.targetHeading = snapped.heading || v.heading;
+            state.targetLat = v.lat;
+            state.targetLng = v.lng;
+            state.targetHeading = v.heading;
             state.speedKmH = v.speedKmH || 22;
             state.lastUpdate = now;
           }
@@ -208,12 +216,19 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
     }
   }, [activeMomStop.lat, activeMomStop.lng, route.direction]);
 
-  // Poll at ~1 second for a noticeably more live, near-real-time feel without overloading the feed.
+  // Poll aggressively for the most live feel possible without starving the feed
+  // 600ms keeps the bus positions responsive while still staying within a normal live-vehicle refresh cadence.
   useEffect(() => {
     refreshTTCFeed();
-    const interval = setInterval(refreshTTCFeed, 1000);
+    const interval = setInterval(refreshTTCFeed, 600);
     return () => clearInterval(interval);
   }, [refreshTTCFeed]);
+
+  // Repaint the ETA once per second so the card does not wait for a feed response.
+  useEffect(() => {
+    const interval = setInterval(() => setEtaTick((tick) => tick + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // ==============================================================
   // 60 FPS HARDWARE-ACCELERATED REQUESTANIMATIONFRAME GLIDE ENGINE
@@ -300,7 +315,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
   // ==============================================================
   const createRealisticVehicleIcon = (
     cleanVid: string,
-    minutes: number,
+    etaLabel: string,
     heading: number,
     isPrimary: boolean,
     isSelected: boolean
@@ -316,7 +331,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
         
         <!-- Floating Realistic ETA Badge -->
         <div style="padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 800; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #FFFFFF; ${bgGradient} border: 1.5px solid rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.3); margin-bottom: 2px; white-space: nowrap; letter-spacing: -0.2px;">
-          ${minutes}m
+          ${etaLabel}
         </div>
 
         <!-- Rotating vehicle orientation keeps the front arrow attached to the bus nose -->
@@ -588,7 +603,13 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
       const effectiveLng = state ? state.currentLng : v.lng;
       const effectiveHeading = state ? state.currentHeading : v.heading;
 
-      const html = createRealisticVehicleIcon(v.cleanVid, v.minutesToMomStop, effectiveHeading, isPrimary, isSelected);
+      const html = createRealisticVehicleIcon(
+        v.cleanVid,
+        v.isApproaching === false ? 'Not approaching' : `${formatEtaMinutes(v.minutesToMomStop)}m`,
+        effectiveHeading,
+        isPrimary,
+        isSelected
+      );
 
       let marker = currentMarkers.get(v.id);
       if (!marker) {
@@ -709,6 +730,31 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
   const selectedVehicle = liveVehicles.find((v) => v.id === selectedVehicleId) || (liveVehicles.length > 0 ? liveVehicles[0] : null);
 
+  const getLiveEtaMinutes = (vehicle: RealTTCVehicle) => {
+    void etaTick;
+    if (vehicle.isApproaching === false) return Infinity;
+    const state = animStatesRef.current.get(vehicle.id);
+    const currentLat = state?.currentLat ?? vehicle.lat;
+    const currentLng = state?.currentLng ?? vehicle.lng;
+    const distanceFromLastFeed = getDistanceMeters(currentLat, currentLng, vehicle.lat, vehicle.lng);
+    const estimatedDistance = Math.max(0, vehicle.distanceMeters - distanceFromLastFeed);
+    const speedMetersPerMinute = Math.max(vehicle.speedKmH, 1) * 1000 / 60;
+    return Math.max(0.5, estimatedDistance / speedMetersPerMinute);
+  };
+
+  const formatEta = (vehicle: RealTTCVehicle) => {
+    const etaMinutes = getLiveEtaMinutes(vehicle);
+    if (!Number.isFinite(etaMinutes)) return 'Not approaching';
+    return `${formatEtaMinutes(etaMinutes)} MIN`;
+  };
+
+  const getHeadingRelativeToYou = (vehicle: RealTTCVehicle) => {
+    const targetStop = isGoingToWork ? MOM_WORK_STOP : MOM_HOME_STOP;
+    const bearingToStop = calculateBearing(vehicle.lat, vehicle.lng, targetStop.lat, targetStop.lng);
+    const relativeAngle = ((bearingToStop - vehicle.heading + 540) % 360) - 180;
+    return Math.abs(relativeAngle) <= 90 ? 'Toward you' : 'Away from you';
+  };
+
   return (
     <div className="relative flex flex-col w-full h-full min-h-screen bg-[#F2F2F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans select-none overflow-hidden">
       
@@ -825,7 +871,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
             >
               <span className={`w-2 h-2 rounded-full ${isPrimary ? 'bg-red-500 animate-pulse' : 'bg-blue-500'}`} />
               <span>#{v.cleanVid}</span>
-              <span className="font-extrabold text-[11px] opacity-90">({v.minutesToMomStop}m)</span>
+              <span className="font-extrabold text-[11px] opacity-90">({formatEta(v).toLowerCase()})</span>
             </button>
           );
         })}
@@ -944,10 +990,10 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
 
               <div className="text-right">
                 <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">
-                  {selectedVehicle.minutesToMomStop} MIN
+                  {formatEta(selectedVehicle)}
                 </div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                  {selectedVehicle.arrivalClockTime}
+                  {selectedVehicle.isApproaching === false ? 'No arrival estimate' : selectedVehicle.arrivalClockTime}
                 </div>
               </div>
             </div>
@@ -963,7 +1009,7 @@ export const AccessibleMap: React.FC<AccessibleMapProps> = ({
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-1">
                   <Compass className="w-3 h-3 text-blue-500" /> Heading
                 </div>
-                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{selectedVehicle.direction} ({selectedVehicle.heading}°)</div>
+                <div className="font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">{getHeadingRelativeToYou(selectedVehicle)}</div>
               </div>
               <div className="bg-slate-100/70 dark:bg-slate-800/60 p-2 rounded-xl">
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Seats</div>
