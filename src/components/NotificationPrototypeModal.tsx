@@ -85,8 +85,8 @@ export const NotificationPrototypeModal: React.FC<NotificationPrototypeModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start lg:items-center justify-center p-3 lg:p-4 pb-20 lg:pb-4 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl lg:rounded-3xl max-w-2xl w-full p-4 lg:p-8 shadow-2xl border-2 border-slate-300 dark:border-slate-700 max-h-[calc(100dvh-5rem)] lg:max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] overflow-y-auto bg-white dark:bg-slate-950 animate-fade-in">
+      <div className="min-h-full w-full max-w-3xl mx-auto bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-5 sm:p-8 lg:p-10">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3 min-w-0">

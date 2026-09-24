@@ -103,7 +103,7 @@ export default function App() {
       }`}
     >
       {/* IN-APP REAL-TIME TOAST ALERT (When 10 min or 5 min triggers) */}
-      {activeToast && (
+      {activeToast && !showNotificationModal && (
         <aside
           aria-live="polite"
           className={`fixed z-[70] flex items-center justify-between gap-2 animate-bounce backdrop-blur-sm ${
@@ -246,7 +246,7 @@ export default function App() {
 
       {/* MOBILE BOTTOM NAVIGATION DOCK (Thumb Ergonomics) */}
       <div
-        className={`lg:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center backdrop-blur-md ${
+        className={`${showNotificationModal ? 'hidden' : 'lg:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center'} backdrop-blur-md ${
           isYellowContrast
             ? 'bg-black/95 border-yellow-500'
             : isNight
