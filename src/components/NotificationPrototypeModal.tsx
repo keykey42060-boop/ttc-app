@@ -85,8 +85,8 @@ export const NotificationPrototypeModal: React.FC<NotificationPrototypeModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-3 sm:p-4 pb-20 sm:pb-4 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-8 shadow-2xl border-2 border-slate-300 dark:border-slate-700 max-h-[calc(100dvh-5rem)] sm:max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[60] flex items-start lg:items-center justify-center p-3 lg:p-4 pb-20 lg:pb-4 overflow-y-auto bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-2xl lg:rounded-3xl max-w-2xl w-full p-4 lg:p-8 shadow-2xl border-2 border-slate-300 dark:border-slate-700 max-h-[calc(100dvh-5rem)] lg:max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3 min-w-0">
@@ -94,8 +94,8 @@ export const NotificationPrototypeModal: React.FC<NotificationPrototypeModalProp
               <Bell className="w-6 h-6 stroke-[2.5]" />
             </div>
             <div>
-              <h2 className="text-lg sm:text-2xl font-black leading-tight">Set Up When to Notify Mom</h2>
-              <p className="text-xs sm:text-sm font-semibold opacity-75">
+              <h2 className="text-lg lg:text-2xl font-black leading-tight">Set Up When to Notify Mom</h2>
+              <p className="text-xs lg:text-sm font-semibold opacity-75">
                 Customize alert distance and minutes away for TTC Bus 121
               </p>
             </div>

@@ -246,7 +246,7 @@ export default function App() {
 
       {/* MOBILE BOTTOM NAVIGATION DOCK (Thumb Ergonomics) */}
       <div
-        className={`md:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center backdrop-blur-md ${
+        className={`lg:hidden sticky bottom-0 left-0 right-0 z-40 border-t py-1.5 px-1 grid grid-cols-5 items-center backdrop-blur-md ${
           isYellowContrast
             ? 'bg-black/95 border-yellow-500'
             : isNight
