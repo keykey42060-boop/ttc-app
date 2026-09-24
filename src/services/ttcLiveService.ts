@@ -9,6 +9,8 @@ import {
   MOM_HOME_STOP,
 } from '../data/ttc121Geometry';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
 export interface RealTTCVehicle {
   id: string;
   vehicleNumber: string;
@@ -22,6 +24,7 @@ export interface RealTTCVehicle {
   destination: string;
   passengerLoad: string;
   minutesToMomStop: number;
+  isApproaching?: boolean;
   distanceMeters: number;
   arrivalClockTime: string;
   lastUpdated: string;
@@ -132,7 +135,7 @@ export async function fetchLiveTTCVehicles(
 
     // The response uses the standard bustime-response.vehicle shape.
     const response = await fetch(
-      `/api/vehicle-positions?route=${routeNum}`,
+      `${API_BASE_URL}/api/vehicle-positions?route=${encodeURIComponent(routeNum)}&_ts=${Date.now()}`,
       { cache: 'no-store', signal: controller.signal }
     );
     clearTimeout(timeoutId);
@@ -141,7 +144,9 @@ export async function fetchLiveTTCVehicles(
       const data = await response.json();
       const rawVehicles = data?.['bustime-response']?.vehicle || [];
 
-      if (Array.isArray(rawVehicles) && rawVehicles.length > 0) {
+      if (Array.isArray(rawVehicles)) {
+        if (rawVehicles.length === 0) return [];
+
         const now = new Date();
 
         const parsed: RealTTCVehicle[] = rawVehicles.map((v: any) => {
@@ -150,14 +155,17 @@ export async function fetchLiveTTCVehicles(
           const heading = parseInt(v.hdg, 10) || 0;
           const rawDir = (v.rtdir || '').toLowerCase();
           const direction: 'East' | 'West' = rawDir.includes('west') ? 'West' : rawDir.includes('east') ? 'East' : (heading > 150 && heading < 330) ? 'West' : 'East';
+          const speedKmH = Math.round(parseFloat(v.spd) * 1.60934) || 0;
           const routeEstimate = getRouteDistanceToStop(lat, lng, momStopLat, momStopLng, direction);
           const routeDistanceM = routeEstimate.distanceMeters;
-          const speedKmH = Math.round(parseFloat(v.spd) * 1.60934) || 0;
           const effectiveSpeedKmH = Math.max(speedKmH, 18);
-          const travelMinutes = Math.max(1, Math.ceil(routeDistanceM / (effectiveSpeedKmH * 1000 / 60)));
+          const travelMinutes = Math.max(0.5, routeDistanceM / (effectiveSpeedKmH * 1000 / 60));
           const baselineMinutes = Math.max(1, Math.round(getDistanceMeters(lat, lng, momStopLat, momStopLng) / 250));
-          const estimatedMinutes = routeEstimate.isApproaching
-            ? travelMinutes < 20 ? travelMinutes : baselineMinutes
+          const bearingToStop = calculateBearing(lat, lng, momStopLat, momStopLng);
+          const headingDelta = Math.abs(((bearingToStop - heading + 540) % 360) - 180);
+          const isApproaching = routeEstimate.isApproaching && headingDelta <= 90;
+          const estimatedMinutes = isApproaching
+            ? travelMinutes < 20 ? Number(travelMinutes.toFixed(1)) : baselineMinutes
             : Math.max(20, baselineMinutes + 10);
           const distM = routeDistanceM;
           const arrivalDate = new Date(now.getTime() + estimatedMinutes * 60000);
@@ -185,6 +193,7 @@ export async function fetchLiveTTCVehicles(
             destination: v.des || v.rtdir || (direction === 'East' ? 'Towards Hennick Bridgepoint' : 'Towards Union Station'),
             passengerLoad: loadMap[v.psgld] || 'Seats Available',
             minutesToMomStop: estimatedMinutes,
+            isApproaching,
             distanceMeters: distM,
             arrivalClockTime: arrivalClock,
             lastUpdated: v.tmstmp || now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' }),
@@ -196,11 +205,15 @@ export async function fetchLiveTTCVehicles(
           const aMatches = a.direction === expectedBusDir ? 0 : 1;
           const bMatches = b.direction === expectedBusDir ? 0 : 1;
           if (aMatches !== bMatches) return aMatches - bMatches;
-          return a.minutesToMomStop - b.minutesToMomStop;
+          const aApproaching = a.isApproaching === false ? 1 : 0;
+          const bApproaching = b.isApproaching === false ? 1 : 0;
+          if (aApproaching !== bApproaching) return aApproaching - bApproaching;
+          return a.distanceMeters - b.distanceMeters;
         });
 
-        if (parsed.length > 0) {
-          parsed[0].isClosest = true;
+        const closestApproaching = parsed.find((vehicle) => vehicle.isApproaching !== false);
+        if (closestApproaching) {
+          closestApproaching.isClosest = true;
         }
 
         return parsed;
@@ -211,6 +224,7 @@ export async function fetchLiveTTCVehicles(
   }
 
   // 2. Continuous real-time street motion along official GTFS centerline
+  // This is only used when the live endpoint itself is unavailable.
   return generateContinuous121Vehicles(momStopLat, momStopLng, isGoingHome);
 }
 

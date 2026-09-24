@@ -1,29 +1,15 @@
 import React from 'react';
-import { BusRouteConfig, BusState, AccessibilitySettings } from '../types/bus';
-import { Sliders, Eye, Volume2, FastForward, Play, Pause, RefreshCw, X, Shield, Phone } from 'lucide-react';
+import { AccessibilitySettings } from '../types/bus';
+import { Sliders, Eye, Volume2, X, Phone } from 'lucide-react';
 
 interface TestWithHerPanelProps {
-  route: BusRouteConfig;
-  busState: BusState;
   settings: AccessibilitySettings;
-  isPlaying: boolean;
-  simulationSpeedMultiplier: number;
-  onTogglePlay: () => void;
-  onSetSpeed: (speed: number) => void;
-  onJumpStage: (stage: 'start' | 'midway' | 'arriving' | 'atStop') => void;
   onUpdateSettings: (newSettings: Partial<AccessibilitySettings>) => void;
   onClose: () => void;
 }
 
 export const TestWithHerPanel: React.FC<TestWithHerPanelProps> = ({
-  route,
-  busState,
   settings,
-  isPlaying,
-  simulationSpeedMultiplier,
-  onTogglePlay,
-  onSetSpeed,
-  onJumpStage,
   onUpdateSettings,
   onClose,
 }) => {
@@ -49,73 +35,13 @@ export const TestWithHerPanel: React.FC<TestWithHerPanelProps> = ({
             </button>
           </div>
 
-          {/* SIMULATION PLAYBACK & JUMP CONTROLS */}
-          <div className="mt-5 p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/80 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-extrabold text-sm uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                Bus Movement Simulator
-              </span>
-              <span className="font-bold text-xs text-red-600 dark:text-red-400">
-                1st: {busState.bus1.minutesAway}m ({Math.round(busState.bus1.progress * 100)}%) · 2nd: {busState.bus2.minutesAway}m
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={onTogglePlay}
-                className="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm flex items-center justify-center gap-2"
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                <span>{isPlaying ? 'Pause' : 'Play Live'}</span>
-              </button>
-
-              <button
-                onClick={() => onSetSpeed(simulationSpeedMultiplier === 1 ? 5 : simulationSpeedMultiplier === 5 ? 12 : 1)}
-                className="py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-600 font-bold text-xs"
-              >
-                {simulationSpeedMultiplier}x Speed
-              </button>
-            </div>
-
-            {/* Quick Milestone Jumps */}
-            <div className="pt-2">
-              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">Jump to Milestone:</p>
-              <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
-                <button
-                  onClick={() => onJumpStage('start')}
-                  className="py-2 px-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-left hover:border-red-500"
-                >
-                  ⏱️ 10 min away
-                </button>
-                <button
-                  onClick={() => onJumpStage('midway')}
-                  className="py-2 px-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-left hover:border-red-500"
-                >
-                  🧥 5 min away
-                </button>
-                <button
-                  onClick={() => onJumpStage('arriving')}
-                  className="py-2 px-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-left hover:border-red-500"
-                >
-                  🚶 2 min away
-                </button>
-                <button
-                  onClick={() => onJumpStage('atStop')}
-                  className="py-2 px-2.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-left hover:border-red-500"
-                >
-                  🎉 Arrived at stop
-                </button>
-              </div>
-            </div>
-          </div>
-
           {/* TEXT SIZE ADJUSTMENT */}
           <div className="mt-5 space-y-2">
             <label className="font-extrabold text-sm flex items-center gap-2">
               <Eye className="w-4 h-4 text-red-600" />
               <span>Text Size (For Mom's Eyesight)</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {(['large', 'xlarge', 'huge'] as const).map((size) => (
                 <button
                   key={size}
@@ -132,10 +58,10 @@ export const TestWithHerPanel: React.FC<TestWithHerPanelProps> = ({
             </div>
           </div>
 
-          {/* CONTRAST THEME */}
+          {/* LIGHT / DARK APPEARANCE */}
           <div className="mt-5 space-y-2">
             <label className="font-extrabold text-sm flex items-center gap-2">
-              <span>🎨 Contrast Mode</span>
+              <span>🎨 Appearance</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -157,16 +83,6 @@ export const TestWithHerPanel: React.FC<TestWithHerPanelProps> = ({
                 }`}
               >
                 🌙 Dark Mode
-              </button>
-              <button
-                onClick={() => onUpdateSettings({ theme: 'contrast-yellow' })}
-                className={`py-2.5 px-2 rounded-xl text-center font-bold text-xs border-2 ${
-                  settings.theme === 'contrast-yellow'
-                    ? 'border-yellow-400 bg-black text-yellow-300 font-black'
-                    : 'border-slate-200 text-slate-600'
-                }`}
-              >
-                🟡 High Yellow
               </button>
             </div>
           </div>

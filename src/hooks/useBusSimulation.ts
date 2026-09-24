@@ -5,6 +5,7 @@ import { playChime, speakAnnouncement, triggerVibration, sendOsNotification } fr
 interface UseBusSimulationProps {
   route: BusRouteConfig;
   settings: AccessibilitySettings;
+  liveVehicleCount: number;
   onNotificationTrigger?: (minutesAway: number, title: string, body: string) => void;
 }
 
@@ -74,7 +75,7 @@ function interpolateGeoRoute(points: GeoRoutePoint[], rawProgress: number) {
   };
 }
 
-export function useBusSimulation({ route, settings, onNotificationTrigger }: UseBusSimulationProps) {
+export function useBusSimulation({ route, settings, liveVehicleCount, onNotificationTrigger }: UseBusSimulationProps) {
   const [progressBus1, setProgressBus1] = useState<number>(0.35); // ~4 min away incoming
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [simulationSpeedMultiplier, setSimulationSpeedMultiplier] = useState<number>(1);
@@ -240,6 +241,8 @@ export function useBusSimulation({ route, settings, onNotificationTrigger }: Use
   }, [isPlaying, simulationSpeedMultiplier]);
 
   const checkCustomNotifications = useCallback((minAway: number, isAtStop: boolean) => {
+    if (liveVehicleCount === 0) return;
+
     const thresholds = settings.customNotificationMinutes || [10, 5];
 
     thresholds.forEach((thresh) => {
@@ -278,13 +281,18 @@ export function useBusSimulation({ route, settings, onNotificationTrigger }: Use
 
     prevProgressRef.current = progressBus1;
     isFirstMountRef.current = false;
-  }, [progressBus1, computedState.bus1.arrivalClockTime, computedState.bus1.currentStreet, computedState.lastPassedLandmark?.name, route.myStopName, route.routeNumber, settings, onNotificationTrigger]);
+  }, [progressBus1, computedState.bus1.arrivalClockTime, computedState.bus1.currentStreet, computedState.lastPassedLandmark?.name, route.myStopName, route.routeNumber, settings, liveVehicleCount, onNotificationTrigger]);
 
   useEffect(() => {
     checkCustomNotifications(computedState.bus1.minutesAway, computedState.isAtStop);
   }, [computedState.bus1.minutesAway, computedState.isAtStop, checkCustomNotifications]);
 
   const speakCurrentStatus = useCallback(() => {
+    if (liveVehicleCount === 0) {
+      speakAnnouncement('There are no Route 121 buses currently active. Please check again later.', settings.voiceSpeed);
+      return;
+    }
+
     const min1 = computedState.bus1.minutesAway;
     const min2 = computedState.bus2.minutesAway;
     const commuteLabel = route.direction === 'to_work' ? 'to work' : 'home';
@@ -299,7 +307,7 @@ export function useBusSimulation({ route, settings, onNotificationTrigger }: Use
       message = `Mom, the first Bus 121 going ${commuteLabel} is ${min1} minutes away, arriving at ${computedState.bus1.arrivalClockTime}. ${landmarkNote} ${computedState.adviceText}. The second bus is behind it, arriving in ${min2} minutes at ${computedState.bus2.arrivalClockTime}.`;
     }
     speakAnnouncement(message, settings.voiceSpeed);
-  }, [computedState, route.direction, settings.voiceSpeed]);
+  }, [computedState, liveVehicleCount, route.direction, settings.voiceSpeed]);
 
   const jumpToStage = useCallback((stage: 'start' | 'midway' | 'arriving' | 'atStop') => {
     switch (stage) {

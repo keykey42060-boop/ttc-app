@@ -1,0 +1,8 @@
+{
+  "appId": "com.clearride.ttc121",
+  "appName": "ClearRide TTC 121",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

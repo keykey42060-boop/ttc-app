@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: clearride-ttc121
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
